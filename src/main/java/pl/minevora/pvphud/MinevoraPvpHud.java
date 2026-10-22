@@ -174,7 +174,7 @@ public class MinevoraPvpHud implements ClientModInitializer {
             panel(context,client,POTION,po,lines,width,height,rows);
         }
         Setting fp = settings.get(FPS);
-        if (fp.enabled) panel(context,client,FPS,fp,List.of("FPS  " + MinecraftClient.getCurrentFps()),width,height,rows);
+        if (fp.enabled) panel(context,client,FPS,fp,List.of("FPS  " + client.getCurrentFps()width,height,rows);
         Setting co = settings.get(COMBO);
         if (co.enabled && combo>0) panel(context,client,COMBO,co,List.of("COMBO  " + combo),width,height,rows);
         Setting cross = settings.get(CROSSHAIR);
