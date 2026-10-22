@@ -1,16 +1,17 @@
 {
   "schemaVersion": 1,
-  "id": "minevora_pvp_hud",
+  "id": "minevorapvphud",
   "version": "${version}",
   "name": "MINEVORA PvP HUD",
-  "description": "Cosmetic client-side HUD controlled from the MINEVORA launcher.",
+  "description": "Ciemny, fioletowy interfejs PvP HUD: Armor HUD, Keystrokes, FPS, CPS, Combo i Crosshair.",
+  "authors": ["MINEVORA"],
   "environment": "client",
-  "entrypoints": { "client": ["pl.minevora.pvphud.MinevoraPvpHud"] },
+  "entrypoints": {"client": ["pl.minevora.pvphud.MinevoraPvpHud"]},
+  "icon": "assets/minevorapvphud/icon.png",
   "depends": {
     "fabricloader": ">=0.16.10",
     "minecraft": "~1.21.1",
     "java": ">=21",
     "fabric-api": "*"
-  },
-  "license": "MIT"
+  }
 }

@@ -1,0 +1,349 @@
+package pl.minevora.pvphud;
+
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.ChatScreen;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import org.lwjgl.glfw.GLFW;
+
+/** Visual configuration UI inspired by the supplied MINEVORA reference. */
+public final class MinevoraScreen extends Screen {
+    private static final int W=1100,H=750;
+    private static final String[] TABS={"Mod Menu","HUD","Armor","Keystrokes","Crosshair","Chat","Settings"};
+    private static final int[] TAB_X={290,394,474,566,681,791,870};
+    private static final int[] TAB_W={96,72,84,107,100,71,99};
+    private static final Identifier PREVIEW=Identifier.of("minevorapvphud","textures/gui/preview.png");
+    private static final int[] COLORS={0xFFFFFFFF,0xFF63E5EF,0xFFAD78FF,0xFFF5CD5C,0xFF55DD79,0xFFFF647B};
+    private final MinevoraConfig c = MinevoraPvpHud.CONFIG;
+    private int tab=2;
+    private boolean minimized=false, draggingHud=false, moveMode=false;
+    private String slider="";
+    private double originX,originY,scale;
+    private int previewX,previewY;
+
+    public MinevoraScreen() {super(Text.literal("MINEVORA PvP Mod"));}
+    @Override protected void init() {super.init();}
+    @Override public boolean shouldPause() {return false;}
+
+    private void computeBounds() {
+        scale=Math.min((width-16)/(double)W,(height-16)/(double)H);
+        originX=(width-W*scale)*.5;originY=(height-H*scale)*.5;
+    }
+    private double sx(double value){return (value-originX)/scale;}
+    private double sy(double value){return (value-originY)/scale;}
+    @Override public void render(DrawContext d,int mouseX,int mouseY,float delta) {
+        computeBounds();
+        GuiDraw.rect(d,0,0,width,height,0xB6080D17);
+        d.getMatrices().push();
+        d.getMatrices().translate(originX,originY,0);
+        d.getMatrices().scale((float)scale,(float)scale,1);
+        drawWindow(d);
+        d.getMatrices().pop();
+        super.render(d,mouseX,mouseY,delta);
+    }
+    private void drawWindow(DrawContext d) {
+        int panelH=minimized?85:718;
+        GuiDraw.rounded(d,0,0,W,panelH,18,0xFF293249);
+        GuiDraw.rounded(d,2,2,W-4,panelH-4,17,GuiDraw.PANEL);
+        GuiDraw.rounded(d,17,14,40,50,9,0xFF15102A);
+        GuiDraw.bigText(d,"M",24,24,3.4f,GuiDraw.ACCENT);
+        GuiDraw.bigText(d,"MINEVORA",66,28,2.6f,GuiDraw.WHITE);
+        GuiDraw.bigText(d,"PvP Mod",208,39,1.15f,0xFF97B9EF);
+        for(int i=0;i<TABS.length;i++) {
+            int x=TAB_X[i],w=TAB_W[i];
+            GuiDraw.outlined(d,x,15,w,55,8,tab==i?0xFF251543:0xFF0F1625,
+                tab==i?GuiDraw.ACCENT:0xFF273145);
+            GuiDraw.bigText(d,iconFor(i),x+w/2-5,23,1.3f,tab==i?0xFFA973FF:GuiDraw.MUTED);
+            GuiDraw.centerText(d,TABS[i],x,52,w,tab==i?GuiDraw.WHITE:GuiDraw.MUTED);
+        }
+        GuiDraw.chip(d,minimized?"+":"-",1004,20,40,false);
+        GuiDraw.chip(d,"X",1050,20,35,false);
+        if(minimized){GuiDraw.text(d,"Naciśnij +, aby rozwinąć panel.",30,65,GuiDraw.MUTED);return;}
+        GuiDraw.rect(d,18,83,W-36,1,0xFF2A334A);
+        GuiDraw.rounded(d,18,86,1064,611,12,0xFF0A0F18);
+        GuiDraw.rect(d,18,86,1064,1,0xFF29334B);
+        if(tab==2)drawArmor(d);
+        else if(tab==0)drawModules(d);
+        else if(tab==1)drawHudTab(d);
+        else if(tab==3)drawKeystrokesTab(d);
+        else if(tab==4)drawCrosshairTab(d);
+        else if(tab==5)drawChatTab(d);
+        else drawSettingsTab(d);
+        GuiDraw.text(d,"MINEVORA 2.0  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
+    }
+    private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
+    private void heading(DrawContext d,String title,String subtitle) {
+        GuiDraw.bigText(d,title,88,104,1.95f,GuiDraw.WHITE);
+        GuiDraw.text(d,subtitle,88,134,GuiDraw.MUTED);
+        GuiDraw.bigText(d,"◆",37,104,2.5f,GuiDraw.ACCENT);
+    }
+    private void drawArmor(DrawContext d) {
+        heading(d,"Armor HUD","Customize how your armor, items and durability are displayed in-game.");
+        GuiDraw.chip(d,moveMode?"Move  ON":"Move  +",745,107,93,moveMode);
+        GuiDraw.chip(d,c.previewOn?"◉  Mod Preview":"⊘  Mod Preview",848,107,129,c.previewOn);
+        GuiDraw.chip(d,"↻ Reset Settings",984,107,98,false);
+        GuiDraw.text(d,"⌃   Style",36,160,GuiDraw.WHITE);
+        GuiDraw.outlined(d,31,178,528,405,9,0xFF0D111A,0xFF242D40);
+        rowLabel(d,"Display Style",198);
+        chips(d,new String[]{"Vertical","Horizontal","Compact","Modern"},new int[]{241,316,409,490},new int[]{72,89,77,65},198,c.style);
+        rowLabel(d,"Text Color",229);
+        swatch(d,513,226,c.textColor);
+        rowLabel(d,"Dynamic Color",260);
+        GuiDraw.toggle(d,513,256,c.dynamicColor);
+        rowLabel(d,"Damage Display Type",291);
+        chips(d,new String[]{"Value","Percent","Bar"},new int[]{345,417,498},new int[]{68,77,55},289,c.damageMode);
+        rowLabel(d,"Tool Location",322);
+        chips(d,new String[]{"Left","Right"},new int[]{447,504},new int[]{55,49},320,c.toolLocation);
+        rowLabel(d,"Text Alignment",353);
+        chips(d,new String[]{"Left","Center","Right"},new int[]{364,426,496},new int[]{58,66,57},351,c.alignment);
+        rowLabel(d,"List Mode",384);
+        chips(d,new String[]{"Normal","Minimal","Outlined"},new int[]{333,408,482},new int[]{70,70,71},382,c.listMode);
+        rowLabel(d,"Spacing",415);
+        slider(d,295,416,251,Math.min(1,c.spacing/12f),String.valueOf(c.spacing));
+        rowLabel(d,"Background",446);
+        GuiDraw.toggle(d,513,442,c.background);
+        rowLabel(d,"Background Color",477);
+        swatch(d,513,474,c.bgColor);
+        rowLabel(d,"Border",508);
+        GuiDraw.toggle(d,513,504,c.border);
+        rowLabel(d,"Border Color",539);
+        swatch(d,513,536,c.borderColor);
+        rowLabel(d,"Border Thickness",569);
+        slider(d,295,566,251,Math.min(1,c.borderThickness/5f),String.valueOf(c.borderThickness));
+        GuiDraw.text(d,"⌄   Show",36,600,GuiDraw.WHITE);
+        GuiDraw.outlined(d,31,617,528,76,9,0xFF0D111A,0xFF242D40);
+        showItem(d,"Helmet",48,631,219,c.helmet);
+        showItem(d,"Chestplate",48,666,219,c.chestplate);
+        showItem(d,"Leggings",310,631,504,c.leggings);
+        showItem(d,"Boots",310,666,504,c.boots);
+        drawPreview(d);
+    }
+    private void rowLabel(DrawContext d,String label,int y) {GuiDraw.text(d,label,50,y,GuiDraw.MUTED);}
+    private void chips(DrawContext d,String[] names,int[] xs,int[] ws,int y,String current) {
+        for(int i=0;i<names.length;i++) GuiDraw.chip(d,names[i],xs[i],y-6,ws[i],current.equals(names[i]));
+    }
+    private void swatch(DrawContext d,int x,int y,int color){
+        GuiDraw.outlined(d,x,y,40,22,4,color,0xFF4A526C);
+    }
+    private void slider(DrawContext d,int x,int y,int w,float fraction,String value) {
+        GuiDraw.rounded(d,x,y-3,42,24,4,GuiDraw.BUTTON);
+        GuiDraw.centerText(d,value,x,y+4,42,GuiDraw.WHITE);
+        int trackX=x+55;
+        GuiDraw.rounded(d,trackX,y+8,w-55,4,2,0xFF30384A);
+        int to=trackX+Math.round(Math.max(0,Math.min(1,fraction))*(w-55));
+        GuiDraw.rounded(d,trackX,y+8,to-trackX,4,2,GuiDraw.ACCENT);
+        GuiDraw.rounded(d,to-7,y+3,14,14,7,0xFF8B59FF);
+    }
+    private void showItem(DrawContext d,String title,int x,int y,int tx,boolean on) {
+        GuiDraw.rounded(d,x,y-7,30,28,4,0xFF16212B);
+        GuiDraw.centerText(d,title.equals("Helmet")?"H":title.equals("Chestplate")?"C":title.equals("Leggings")?"L":"B",x,y+2,30,GuiDraw.CYAN);
+        GuiDraw.text(d,"Show "+title,x+42,y+3,GuiDraw.MUTED);
+        GuiDraw.toggle(d,tx,y-3,on);
+    }
+    private void drawPreview(DrawContext d){
+        GuiDraw.outlined(d,576,179,504,512,9,0xFF131D25,0xFF334058);
+        if(!c.previewOn) {
+            GuiDraw.bigText(d,"Podgląd wyłączony",682,400,1.7f,GuiDraw.MUTED);
+            GuiDraw.text(d,"Włącz przyciskiem Mod Preview.",702,430,GuiDraw.MUTED);
+            return;
+        }
+        d.drawTexture(PREVIEW,579,182,0,0,498,505,512,580);
+        GuiDraw.rect(d,579,183,498,505,0x18071327);
+        int width=ArmorOverlay.panelWidth(c),height=ArmorOverlay.panelHeight(c,6);
+        previewX=579+Math.round(c.hudX*Math.max(1,498-width));
+        previewY=182+Math.round(c.hudY*Math.max(1,505-height));
+        // In the preview item icons and values update with each setting.
+        ArmorOverlay.renderPreview(d,client,c,previewX,previewY);
+    }
+    private void genericPanel(DrawContext d,String title,String desc){
+        heading(d,title,desc);
+        GuiDraw.outlined(d,32,178,1038,510,12,0xFF101623,0xFF293247);
+    }
+    private void moduleLine(DrawContext d,int n,String name,String sub,int x,int y) {
+        GuiDraw.outlined(d,x,y,470,76,8,0xFF111826,0xFF2B354B);
+        GuiDraw.bigText(d,"◆",x+16,y+21,1.8f,n==0?GuiDraw.CYAN:GuiDraw.ACCENT);
+        GuiDraw.bigText(d,name,x+58,y+15,1.4f,GuiDraw.WHITE);
+        GuiDraw.text(d,sub,x+58,y+43,GuiDraw.MUTED);
+        GuiDraw.toggle(d,x+412,y+26,c.enabled[n]);
+    }
+    private void drawModules(DrawContext d) {
+        genericPanel(d,"Mod Menu","Włącz i wyłącz moduły PvP HUD jednym kliknięciem.");
+        String[] names={"Armor HUD","Keystrokes","CPS Counter","FPS Counter","Potion HUD","Crosshair Editor","Combo Counter"};
+        String[] desc={"Ikony i trwałość wyposażenia","Klawisze WASD w grze","Kliknięcia LPM / PPM","Aktualna liczba klatek","Efekty mikstur i czas","Dodatkowy celownik","Licznik lokalnych prób ataku"};
+        for(int i=0;i<7;i++)moduleLine(d,i,names[i],desc[i],i%2==0?54:547,194+(i/2)*112);
+        GuiDraw.text(d,"Konfigurację zbroi znajdziesz w zakładce Armor.",55,654,GuiDraw.MUTED);
+    }
+    private void drawHudTab(DrawContext d) {
+        genericPanel(d,"HUD Editor","Przesuwaj panel zbroi i zmieniaj jego położenie na ekranie.");
+        GuiDraw.text(d,"Położenie poziome",67,241,GuiDraw.WHITE);
+        slider(d,248,235,680,c.hudX,Math.round(c.hudX*100)+"%");
+        GuiDraw.text(d,"Położenie pionowe",67,312,GuiDraw.WHITE);
+        slider(d,248,306,680,c.hudY,Math.round(c.hudY*100)+"%");
+        GuiDraw.text(d,"Armor HUD",67,393,GuiDraw.WHITE);
+        GuiDraw.toggle(d,260,388,c.enabled[0]);
+        GuiDraw.text(d,"Elementy wyposażenia",67,450,GuiDraw.WHITE);
+        GuiDraw.chip(d,c.tool?"Miecz  ON":"Miecz OFF",248,439,122,c.tool);
+        GuiDraw.chip(d,c.offhand?"Druga ręka  ON":"Druga ręka OFF",384,439,142,c.offhand);
+        GuiDraw.text(d,"Przytrzymaj Move w zakładce Armor i przeciągnij HUD w podglądzie.",67,553,GuiDraw.MUTED);
+    }
+    private void drawKeystrokesTab(DrawContext d){
+        genericPanel(d,"Keystrokes","Wyświetlaj naciśnięte klawisze w trakcie PvP.");
+        GuiDraw.text(d,"Pokaż WASD / Keystrokes",65,230,GuiDraw.WHITE);
+        GuiDraw.toggle(d,342,225,c.enabled[1]);
+        GuiDraw.chip(d,"W",688,274,55,false);
+        GuiDraw.chip(d,"A",626,312,55,false);
+        GuiDraw.chip(d,"S",688,312,55,false);
+        GuiDraw.chip(d,"D",750,312,55,false);
+        GuiDraw.text(d,"Rzeczywiste klawisze podświetlają się podczas gry.",65,399,GuiDraw.MUTED);
+        GuiDraw.text(d,"Lokalizacja: prawy górny róg ekranu.",65,423,GuiDraw.MUTED);
+    }
+    private void drawCrosshairTab(DrawContext d){
+        genericPanel(d,"Crosshair Editor","Włącz dodatkowy, fioletowy celownik PvP.");
+        GuiDraw.text(d,"Crosshair",65,241,GuiDraw.WHITE);
+        GuiDraw.toggle(d,260,233,c.enabled[5]);
+        int x=760,y=346;
+        GuiDraw.rect(d,x-1,y-1,3,3,0xFF9A65FF);
+        GuiDraw.rect(d,x-22,y,15,2,GuiDraw.ACCENT);
+        GuiDraw.rect(d,x+9,y,15,2,GuiDraw.ACCENT);
+        GuiDraw.rect(d,x,y-22,2,15,GuiDraw.ACCENT);
+        GuiDraw.rect(d,x,y+9,2,15,GuiDraw.ACCENT);
+        GuiDraw.text(d,"Celownik Minecraft nadal może być widoczny pod nakładką.",65,438,GuiDraw.MUTED);
+    }
+    private void drawChatTab(DrawContext d){
+        genericPanel(d,"Chat","Szybki dostęp do czatu Minecraft.");
+        GuiDraw.text(d,"Mod korzysta z czatu wbudowanego w grę.",65,257,GuiDraw.WHITE);
+        GuiDraw.chip(d,"Otwórz czat Minecraft",65,319,215,true);
+        GuiDraw.text(d,"Ta wersja nie modyfikuje ani nie odczytuje wiadomości serwera.",65,385,GuiDraw.MUTED);
+    }
+    private void drawSettingsTab(DrawContext d){
+        genericPanel(d,"Settings","Kolory, ustawienia globalne i przywracanie domyślnych wartości.");
+        GuiDraw.text(d,"Kolor tekstu Armor HUD",65,230,GuiDraw.WHITE);
+        for(int i=0;i<COLORS.length;i++)swatch(d,272+i*49,223,COLORS[i]);
+        GuiDraw.text(d,"Kolor obramowania",65,287,GuiDraw.WHITE);
+        for(int i=0;i<COLORS.length;i++)swatch(d,272+i*49,280,COLORS[i]);
+        GuiDraw.text(d,"Widoczność liczb",65,354,GuiDraw.WHITE);
+        GuiDraw.toggle(d,280,346,c.showText);
+        GuiDraw.text(d,"Przycisk otwierania menu: Prawy Shift (możesz zmienić w Sterowaniu Minecraft).",65,419,GuiDraw.MUTED);
+        GuiDraw.chip(d,"RESET ALL SETTINGS",65,520,230,false);
+        GuiDraw.text(d,"Zapis: .minecraft/config/minevora_pvp.json",65,573,GuiDraw.MUTED);
+    }
+    private int findChip(double mx,double my,String[] names,int[] xs,int[] ws,int y){
+        for(int i=0;i<names.length;i++)if(GuiDraw.inside(mx,my,xs[i],y-6,ws[i],27))return i;
+        return -1;
+    }
+    private boolean toggleClick(double mx,double my,int x,int y) {return GuiDraw.inside(mx,my,x,y,43,23);}
+    private int nextColor(int current) {
+        for(int i=0;i<COLORS.length;i++)if(COLORS[i]==current)return COLORS[(i+1)%COLORS.length];
+        return COLORS[0];
+    }
+    private void updateHudDrag(double mx,double my) {
+        int w=ArmorOverlay.panelWidth(c),h=ArmorOverlay.panelHeight(c,6);
+        c.hudX=clamp((float)((mx-579-w/2.0)/Math.max(1,498-w)));
+        c.hudY=clamp((float)((my-182-16)/Math.max(1,505-h)));
+    }
+    private float clamp(float value) {return Math.max(0f,Math.min(1f,value));}
+    @Override public boolean mouseClicked(double mouseX,double mouseY,int button) {
+        computeBounds(); double x=sx(mouseX),y=sy(mouseY);
+        if(button!=GLFW.GLFW_MOUSE_BUTTON_LEFT)return super.mouseClicked(mouseX,mouseY,button);
+        if(GuiDraw.inside(x,y,1050,20,35,27)){close();return true;}
+        if(GuiDraw.inside(x,y,1004,20,40,27)){minimized=!minimized;return true;}
+        if(minimized)return true;
+        for(int i=0;i<TABS.length;i++) {
+            if(GuiDraw.inside(x,y,TAB_X[i],15,TAB_W[i],55)){tab=i;return true;}
+        }
+        boolean changed=false;
+        switch(tab) {
+            case 2 -> changed=clickArmor(x,y);
+            case 0 -> {
+                for(int i=0;i<7;i++){
+                    int bx=i%2==0?54:547,by=194+(i/2)*112;
+                    if(GuiDraw.inside(x,y,bx,by,470,76)){c.enabled[i]=!c.enabled[i];changed=true;break;}
+                }
+            }
+            case 1 -> {
+                if(GuiDraw.inside(x,y,248,229,680,31)){c.hudX=clamp((float)((x-303)/625.0));changed=true;}
+                if(GuiDraw.inside(x,y,248,302,680,31)){c.hudY=clamp((float)((x-303)/625.0));changed=true;}
+                if(toggleClick(x,y,260,388)){c.enabled[0]=!c.enabled[0];changed=true;}
+                if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
+                if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
+            }
+            case 3 -> {if(toggleClick(x,y,342,225)){c.enabled[1]=!c.enabled[1];changed=true;}}
+            case 4 -> {if(toggleClick(x,y,260,233)){c.enabled[5]=!c.enabled[5];changed=true;}}
+            case 5 -> {if(GuiDraw.inside(x,y,65,319,215,27)){client.setScreen(new ChatScreen(""));return true;}}
+            case 6 -> changed=clickSettings(x,y);
+        }
+        if(changed)c.save();
+        return true;
+    }
+    private boolean clickArmor(double x,double y){
+        if(GuiDraw.inside(x,y,848,107,129,27)){c.previewOn=!c.previewOn;return true;}
+        if(GuiDraw.inside(x,y,984,107,98,27)){c.reset();return true;}
+        if(GuiDraw.inside(x,y,745,107,93,27)){moveMode=!moveMode;return true;}
+        if(c.previewOn && ((moveMode && GuiDraw.inside(x,y,579,182,498,505)) ||
+                GuiDraw.inside(x,y,previewX-5,previewY-5,ArmorOverlay.panelWidth(c)+10,ArmorOverlay.panelHeight(c,6)+10))){
+            draggingHud=true;updateHudDrag(x,y);return true;
+        }
+        int idx;
+        String[] styles={"Vertical","Horizontal","Compact","Modern"};
+        idx=findChip(x,y,styles,new int[]{241,316,409,490},new int[]{72,89,77,65},198);
+        if(idx>=0){c.style=styles[idx];return true;}
+        String[] dmg={"Value","Percent","Bar"};
+        idx=findChip(x,y,dmg,new int[]{345,417,498},new int[]{68,77,55},289);
+        if(idx>=0){c.damageMode=dmg[idx];return true;}
+        String[] location={"Left","Right"};
+        idx=findChip(x,y,location,new int[]{447,504},new int[]{55,49},320);
+        if(idx>=0){c.toolLocation=location[idx];return true;}
+        String[] align={"Left","Center","Right"};
+        idx=findChip(x,y,align,new int[]{364,426,496},new int[]{58,66,57},351);
+        if(idx>=0){c.alignment=align[idx];return true;}
+        String[] modes={"Normal","Minimal","Outlined"};
+        idx=findChip(x,y,modes,new int[]{333,408,482},new int[]{70,70,71},382);
+        if(idx>=0){c.listMode=modes[idx];return true;}
+        if(toggleClick(x,y,513,256)){c.dynamicColor=!c.dynamicColor;return true;}
+        if(toggleClick(x,y,513,442)){c.background=!c.background;return true;}
+        if(toggleClick(x,y,513,504)){c.border=!c.border;return true;}
+        if(GuiDraw.inside(x,y,513,226,40,22)){c.textColor=nextColor(c.textColor);return true;}
+        if(GuiDraw.inside(x,y,513,474,40,22)){
+            c.bgColor=c.bgColor==0xDB0A1020?0xDE25183C:c.bgColor==0xDE25183C?0xE0162634:0xDB0A1020;return true;
+        }
+        if(GuiDraw.inside(x,y,513,536,40,22)){c.borderColor=nextColor(c.borderColor);return true;}
+        if(GuiDraw.inside(x,y,295,409,251,25)){slider="spacing";slide(x);return true;}
+        if(GuiDraw.inside(x,y,295,559,251,25)){slider="thickness";slide(x);return true;}
+        if(toggleClick(x,y,219,628)){c.helmet=!c.helmet;return true;}
+        if(toggleClick(x,y,219,663)){c.chestplate=!c.chestplate;return true;}
+        if(toggleClick(x,y,504,628)){c.leggings=!c.leggings;return true;}
+        if(toggleClick(x,y,504,663)){c.boots=!c.boots;return true;}
+        return false;
+    }
+    private boolean clickSettings(double x,double y) {
+        for(int i=0;i<COLORS.length;i++) {
+            if(GuiDraw.inside(x,y,272+i*49,223,40,22)){c.textColor=COLORS[i];return true;}
+            if(GuiDraw.inside(x,y,272+i*49,280,40,22)){c.borderColor=COLORS[i];return true;}
+        }
+        if(toggleClick(x,y,280,346)){c.showText=!c.showText;return true;}
+        if(GuiDraw.inside(x,y,65,520,230,27)){c.reset();return true;}
+        return false;
+    }
+    private void slide(double x) {
+        float fraction=clamp((float)((x-350)/196.0));
+        if(slider.equals("spacing"))c.spacing=Math.round(fraction*12);
+        if(slider.equals("thickness"))c.borderThickness=Math.round(fraction*5);
+        c.save();
+    }
+    @Override public boolean mouseDragged(double mouseX,double mouseY,int button,double deltaX,double deltaY) {
+        double x=sx(mouseX),y=sy(mouseY);
+        if(draggingHud){updateHudDrag(x,y);return true;}
+        if(!slider.isEmpty()){slide(x);return true;}
+        return super.mouseDragged(mouseX,mouseY,button,deltaX,deltaY);
+    }
+    @Override public boolean mouseReleased(double mouseX,double mouseY,int button) {
+        if(draggingHud || !slider.isEmpty()){
+            draggingHud=false;slider="";c.save();return true;
+        }
+        return super.mouseReleased(mouseX,mouseY,button);
+    }
+    @Override public void close(){c.save();super.close();}
+}
