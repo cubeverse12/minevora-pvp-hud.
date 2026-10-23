@@ -91,7 +91,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.9  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.10  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -200,7 +200,11 @@ public final class MinevoraScreen extends Screen {
         String[] desc={"Ikony i trwałość wyposażenia","Kliknięcia LPM / PPM","Aktualna liczba klatek","Efekty mikstur i czas","Dodatkowy celownik","Licznik lokalnych prób ataku"};
         int[] modules={0,2,3,4,5,6};
         for(int i=0;i<modules.length;i++)moduleLine(d,modules[i],names[i],desc[i],i%2==0?54:547,194+(i/2)*112);
-        GuiDraw.text(d,"Konfigurację zbroi znajdziesz w zakładce Armor.",55,654,GuiDraw.MUTED);
+        GuiDraw.outlined(d,54,546,963,83,9,c.hudVisible?0xFF142A28:0xFF2A1724,c.hudVisible?0xFF2D8D69:0xFF92445A);
+        GuiDraw.bigText(d,"MINEVORA PvP HUD",76,559,1.6f,GuiDraw.WHITE);
+        GuiDraw.text(d,c.hudVisible?"STATUS: WLACZONY":"STATUS: WYLACZONY",76,591,c.hudVisible?0xFF65E29E:0xFFFF7289);
+        GuiDraw.chip(d,c.hudVisible?"WYLACZ HUD":"WLACZ HUD",829,571,155,c.hudVisible);
+        GuiDraw.text(d,"Kliknij panel, aby wlaczyc lub wylaczyc HUD w trakcie gry. Skrot: H.",55,654,GuiDraw.MUTED);
     }
     private void drawHudTab(DrawContext d) {
         genericPanel(d,"HUD Editor","Przesuwaj panel zbroi i zmieniaj jego położenie na ekranie.");
@@ -214,6 +218,9 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.chip(d,c.tool?"Miecz  ON":"Miecz OFF",248,439,122,c.tool);
         GuiDraw.chip(d,c.offhand?"Druga ręka  ON":"Druga ręka OFF",384,439,142,c.offhand);
         GuiDraw.text(d,"Przytrzymaj Move w zakładce Armor i przeciągnij HUD w podglądzie.",67,553,GuiDraw.MUTED);
+        GuiDraw.text(d,"Caly PvP HUD podczas gry",67,610,GuiDraw.WHITE);
+        GuiDraw.toggle(d,260,603,c.hudVisible);
+        GuiDraw.text(d,"Wlaczenie i wylaczenie bez restartu. Skrot: H.",67,649,GuiDraw.MUTED);
     }
     private void drawKeystrokesTab(DrawContext d){
         genericPanel(d,"Keystrokes","Kliknięcia myszy i CPS — bez kafelków WASD.");
@@ -294,11 +301,15 @@ public final class MinevoraScreen extends Screen {
         switch(tab) {
             case 2 -> changed=clickArmor(x,y);
             case 0 -> {
-                int[] modules={0,2,3,4,5,6};
-                for(int i=0;i<modules.length;i++){
-                    int bx=i%2==0?54:547,by=194+(i/2)*112;
-                    if(GuiDraw.inside(x,y,bx,by,470,76)){
-                        c.enabled[modules[i]]=!c.enabled[modules[i]];changed=true;break;
+                if(GuiDraw.inside(x,y,54,546,963,83)){
+                    c.hudVisible=!c.hudVisible;changed=true;
+                } else {
+                    int[] modules={0,2,3,4,5,6};
+                    for(int i=0;i<modules.length;i++){
+                        int bx=i%2==0?54:547,by=194+(i/2)*112;
+                        if(GuiDraw.inside(x,y,bx,by,470,76)){
+                            c.enabled[modules[i]]=!c.enabled[modules[i]];changed=true;break;
+                        }
                     }
                 }
             }
@@ -306,6 +317,7 @@ public final class MinevoraScreen extends Screen {
                 if(GuiDraw.inside(x,y,248,229,680,31)){c.hudX=clamp((float)((x-303)/625.0));changed=true;}
                 if(GuiDraw.inside(x,y,248,302,680,31)){c.hudY=clamp((float)((x-303)/625.0));changed=true;}
                 if(toggleClick(x,y,260,388)){c.enabled[0]=!c.enabled[0];changed=true;}
+                if(toggleClick(x,y,260,603)){c.hudVisible=!c.hudVisible;changed=true;}
                 if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
                 if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
             }

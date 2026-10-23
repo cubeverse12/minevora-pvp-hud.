@@ -1,7 +1,9 @@
-# MINEVORA PvP HUD 2.0.9 — Fabric 1.21.1
+# MINEVORA PvP HUD 2.0.10 — Fabric 1.21.1
 
 ## Zmiany
 
+- Dodano duży przełącznik całego PvP HUD w Mod Menu oraz drugi w zakładce HUD. Można wyłączyć i włączyć nakładkę bez restartu Minecrafta.
+- Zachowano skrót H i automatyczny zapis ustawienia widoczności.
 - Usunięto kafelki WASD wyświetlane podczas gry.
 - Usunięto włącznik WASD z menu modułów, a zakładka Keystrokes pokazuje teraz kliknięcia LPM/PPM (CPS).
 - Stara konfiguracja z włączonym WASD nie może już go przywrócić.
