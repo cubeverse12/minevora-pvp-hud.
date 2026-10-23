@@ -1,15 +1,14 @@
-# MINEVORA PvP HUD 2.0.8
-Fabric Minecraft Java 1.21.1, Fabric API, Java 21.
+# MINEVORA PvP HUD 2.0.9 — Fabric 1.21.1
 
-## Nowości
-- Settings: suwak rozmiaru HUD 50–100%.
-- Settings: przelacznik widocznosci calego PvP HUD.
-- Klawisz H: pokaz/ukryj HUD w grze bez jej restartowania.
-- Klawisz P lub prawy Shift: menu.
-- Armor → USTAW HUD: przeciaganie Armor HUD po ekranie, strzalki, rogi 1–4.
-- Prawdziwe ikony przedmiotow i podglad na zywo.
-- Automatyczny zapis ustawien w config/minevora_pvp.json.
+## Zmiany
 
-Budowanie: GitHub Actions → Build MINEVORA PvP HUD, artefakt .jar.
-Nie jest to port Forge/NeoForge ani wielowersyjny plik JAR.
-Wymagane przetestowanie kompilacji i moda w grze.
+- Usunięto kafelki WASD wyświetlane podczas gry.
+- Usunięto włącznik WASD z menu modułów, a zakładka Keystrokes pokazuje teraz kliknięcia LPM/PPM (CPS).
+- Stara konfiguracja z włączonym WASD nie może już go przywrócić.
+- Zachowano Armor HUD, licznik FPS, CPS, Potion HUD, Crosshair, suwaki 50–100%, klawisz H i przesuwanie zbroi.
+
+## Instalacja
+
+Przy aktywnym Fabric 1.21.1 w MINEVORA Launcher kliknij POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA.
+Mod wymaga Fabric API. Prawy Shift / P otwiera menu, H ukrywa lub pokazuje HUD. Zwykłe poruszanie WASD pozostaje bez zmian.
+To wydanie nie jest kompatybilne z Forge ani NeoForge.

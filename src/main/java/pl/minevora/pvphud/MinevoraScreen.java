@@ -47,8 +47,18 @@ public final class MinevoraScreen extends Screen {
     }
     private void drawWindow(DrawContext d) {
         int panelH=minimized?85:718;
-        GuiDraw.rounded(d,0,0,W,panelH,18,0xFF293249);
-        GuiDraw.rounded(d,2,2,W-4,panelH-4,17,GuiDraw.PANEL);
+        if(tab==2 && !minimized) {
+            // A true transparent viewport: the Minecraft world behind the UI remains visible.
+            GuiDraw.rounded(d,0,0,W,181,18,0xFF293249);
+            GuiDraw.rounded(d,2,2,W-4,179,17,GuiDraw.PANEL);
+            GuiDraw.rect(d,0,181,576,506,GuiDraw.PANEL);
+            GuiDraw.rect(d,1078,181,22,506,GuiDraw.PANEL);
+            GuiDraw.rounded(d,0,687,W,31,18,0xFF293249);
+            GuiDraw.rounded(d,2,687,W-4,29,16,GuiDraw.PANEL);
+        } else {
+            GuiDraw.rounded(d,0,0,W,panelH,18,0xFF293249);
+            GuiDraw.rounded(d,2,2,W-4,panelH-4,17,GuiDraw.PANEL);
+        }
         GuiDraw.rounded(d,17,14,40,50,9,0xFF15102A);
         GuiDraw.bigText(d,"M",24,24,3.4f,GuiDraw.ACCENT);
         GuiDraw.bigText(d,"MINEVORA",66,28,2.6f,GuiDraw.WHITE);
@@ -64,7 +74,15 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.chip(d,"X",1050,20,35,false);
         if(minimized){GuiDraw.text(d,"Naciśnij +, aby rozwinąć panel.",30,65,GuiDraw.MUTED);return;}
         GuiDraw.rect(d,18,83,W-36,1,0xFF2A334A);
-        GuiDraw.rounded(d,18,86,1064,611,12,0xFF0A0F18);
+        if(tab==2) {
+            // Do not cover the world behind the right-hand live preview.
+            GuiDraw.rounded(d,18,86,1064,94,12,0xFF0A0F18);
+            GuiDraw.rect(d,18,180,558,510,0xFF0A0F18);
+            GuiDraw.rect(d,1078,180,4,510,0xFF0A0F18);
+            GuiDraw.rect(d,18,690,1064,7,0xFF0A0F18);
+        } else {
+            GuiDraw.rounded(d,18,86,1064,611,12,0xFF0A0F18);
+        }
         GuiDraw.rect(d,18,86,1064,1,0xFF29334B);
         if(tab==2)drawArmor(d);
         else if(tab==0)drawModules(d);
@@ -73,7 +91,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.8  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.9  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -146,17 +164,19 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.toggle(d,tx,y-3,on);
     }
     private void drawPreview(DrawContext d){
-        GuiDraw.outlined(d,576,179,504,512,9,0xFF131D25,0xFF334058);
+        // Transparent preview frame; Minecraft's real world is visible behind the live armor item preview.
+        GuiDraw.rect(d,576,179,504,2,0xFF334058);
+        GuiDraw.rect(d,576,179,2,512,0xFF334058);
+        GuiDraw.rect(d,1078,179,2,512,0xFF334058);
+        GuiDraw.rect(d,576,689,504,2,0xFF334058);
         if(!c.previewOn) {
             GuiDraw.bigText(d,"Podgląd wyłączony",682,400,1.7f,GuiDraw.MUTED);
             GuiDraw.text(d,"Włącz przyciskiem Mod Preview.",702,430,GuiDraw.MUTED);
             return;
         }
-        GuiDraw.rounded(d,579,182,498,505,9,0xFF0C1524);
-        for(int xx=619;xx<1076;xx+=40)GuiDraw.rect(d,xx,184,1,501,0x303E4C72);
-        for(int yy=222;yy<685;yy+=40)GuiDraw.rect(d,580,yy,495,1,0x303E4C72);
-        GuiDraw.text(d,"PODGLAD HUD NA ZYWO",601,198,0xFFE8EEFF);
-        GuiDraw.rect(d,579,183,498,505,0x18071327);
+        GuiDraw.rect(d,579,182,498,505,0x12071327);
+        GuiDraw.rounded(d,592,193,215,24,6,0xD10C1528);
+        GuiDraw.text(d,"PODGLAD HUD NA ZYWO",601,201,0xFFE8EEFF);
         int width=ArmorOverlay.panelWidth(c),height=ArmorOverlay.panelHeight(c,6);
         previewX=579+Math.round(c.hudX*Math.max(1,498-width));
         previewY=182+Math.round(c.hudY*Math.max(1,505-height));
@@ -176,9 +196,10 @@ public final class MinevoraScreen extends Screen {
     }
     private void drawModules(DrawContext d) {
         genericPanel(d,"Mod Menu","Włącz i wyłącz moduły PvP HUD jednym kliknięciem.");
-        String[] names={"Armor HUD","Keystrokes","CPS Counter","FPS Counter","Potion HUD","Crosshair Editor","Combo Counter"};
-        String[] desc={"Ikony i trwałość wyposażenia","Klawisze WASD w grze","Kliknięcia LPM / PPM","Aktualna liczba klatek","Efekty mikstur i czas","Dodatkowy celownik","Licznik lokalnych prób ataku"};
-        for(int i=0;i<7;i++)moduleLine(d,i,names[i],desc[i],i%2==0?54:547,194+(i/2)*112);
+        String[] names={"Armor HUD","CPS Counter","FPS Counter","Potion HUD","Crosshair Editor","Combo Counter"};
+        String[] desc={"Ikony i trwałość wyposażenia","Kliknięcia LPM / PPM","Aktualna liczba klatek","Efekty mikstur i czas","Dodatkowy celownik","Licznik lokalnych prób ataku"};
+        int[] modules={0,2,3,4,5,6};
+        for(int i=0;i<modules.length;i++)moduleLine(d,modules[i],names[i],desc[i],i%2==0?54:547,194+(i/2)*112);
         GuiDraw.text(d,"Konfigurację zbroi znajdziesz w zakładce Armor.",55,654,GuiDraw.MUTED);
     }
     private void drawHudTab(DrawContext d) {
@@ -195,15 +216,17 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Przytrzymaj Move w zakładce Armor i przeciągnij HUD w podglądzie.",67,553,GuiDraw.MUTED);
     }
     private void drawKeystrokesTab(DrawContext d){
-        genericPanel(d,"Keystrokes","Wyświetlaj naciśnięte klawisze w trakcie PvP.");
-        GuiDraw.text(d,"Pokaż WASD / Keystrokes",65,230,GuiDraw.WHITE);
-        GuiDraw.toggle(d,342,225,c.enabled[1]);
-        GuiDraw.chip(d,"W",688,274,55,false);
-        GuiDraw.chip(d,"A",626,312,55,false);
-        GuiDraw.chip(d,"S",688,312,55,false);
-        GuiDraw.chip(d,"D",750,312,55,false);
-        GuiDraw.text(d,"Rzeczywiste klawisze podświetlają się podczas gry.",65,399,GuiDraw.MUTED);
-        GuiDraw.text(d,"Lokalizacja: prawy górny róg ekranu.",65,423,GuiDraw.MUTED);
+        genericPanel(d,"Keystrokes","Kliknięcia myszy i CPS — bez kafelków WASD.");
+        GuiDraw.text(d,"Pokaż licznik CPS",65,230,GuiDraw.WHITE);
+        GuiDraw.toggle(d,342,225,c.enabled[2]);
+        GuiDraw.outlined(d,102,297,390,120,9,0xFF0D1627,0xFF364162);
+        GuiDraw.outlined(d,518,297,390,120,9,0xFF0D1627,0xFF364162);
+        GuiDraw.bigText(d,"LPM",232,311,1.8f,GuiDraw.CYAN);
+        GuiDraw.bigText(d,"PPM",643,311,1.8f,GuiDraw.ACCENT);
+        GuiDraw.bigText(d,String.valueOf(MinevoraPvpHud.lClicks.size()),281,351,2.8f,GuiDraw.WHITE);
+        GuiDraw.bigText(d,String.valueOf(MinevoraPvpHud.rClicks.size()),688,351,2.8f,GuiDraw.WHITE);
+        GuiDraw.text(d,"Kliknięcia z ostatniej sekundy.",102,449,GuiDraw.MUTED);
+        GuiDraw.text(d,"WASD usunięte z HUD-u; normalne poruszanie działa bez zmian.",102,474,GuiDraw.MUTED);
     }
     private void drawCrosshairTab(DrawContext d){
         genericPanel(d,"Crosshair Editor","Włącz dodatkowy, fioletowy celownik PvP.");
@@ -271,9 +294,12 @@ public final class MinevoraScreen extends Screen {
         switch(tab) {
             case 2 -> changed=clickArmor(x,y);
             case 0 -> {
-                for(int i=0;i<7;i++){
+                int[] modules={0,2,3,4,5,6};
+                for(int i=0;i<modules.length;i++){
                     int bx=i%2==0?54:547,by=194+(i/2)*112;
-                    if(GuiDraw.inside(x,y,bx,by,470,76)){c.enabled[i]=!c.enabled[i];changed=true;break;}
+                    if(GuiDraw.inside(x,y,bx,by,470,76)){
+                        c.enabled[modules[i]]=!c.enabled[modules[i]];changed=true;break;
+                    }
                 }
             }
             case 1 -> {
@@ -283,7 +309,7 @@ public final class MinevoraScreen extends Screen {
                 if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
                 if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
             }
-            case 3 -> {if(toggleClick(x,y,342,225)){c.enabled[1]=!c.enabled[1];changed=true;}}
+            case 3 -> {if(toggleClick(x,y,342,225)){c.enabled[2]=!c.enabled[2];changed=true;}}
             case 4 -> {if(toggleClick(x,y,260,233)){c.enabled[5]=!c.enabled[5];changed=true;}}
             case 5 -> {if(GuiDraw.inside(x,y,65,319,215,27)){client.setScreen(new ChatScreen(""));return true;}}
             case 6 -> changed=clickSettings(x,y);

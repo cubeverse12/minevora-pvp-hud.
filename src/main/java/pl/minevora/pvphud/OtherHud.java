@@ -11,16 +11,8 @@ public final class OtherHud {
     private OtherHud() {}
     public static void render(DrawContext ctx,MinecraftClient client,MinevoraConfig c) {
         int sw=client.getWindow().getScaledWidth(),sh=client.getWindow().getScaledHeight();
-        int leftY=12,rightY=12;
-        if(c.enabled[1]) { // WASD
-            String[] keys={" W "," A "," S "," D "};
-            boolean[] pressed={client.options.forwardKey.isPressed(),client.options.leftKey.isPressed(),
-                client.options.backKey.isPressed(),client.options.rightKey.isPressed()};
-            int x=sw-112,y=rightY;
-            drawKey(ctx,c,keys[0],x+34,y,pressed[0]);
-            for(int i=1;i<4;i++)drawKey(ctx,c,keys[i],x+(i-1)*34,y+25,pressed[i]);
-            rightY+=54;
-        }
+        int leftY=12;
+        // WASD HUD removed in 2.0.9. Minecraft movement is unaffected.
         if(c.enabled[2]) {
             leftY=panel(ctx,c,"CPS  "+MinevoraPvpHud.lClicks.size()+" / "+MinevoraPvpHud.rClicks.size(),12,leftY)+5;
         }
@@ -59,13 +51,6 @@ public final class OtherHud {
             GuiDraw.rect(ctx,x,y,2,16,GuiDraw.ACCENT);
             GuiDraw.text(ctx,text,x+7,y+4,GuiDraw.WHITE);
             return y+16;
-        }finally{HudScaleTransform.end(ctx);}
-    }
-    private static void drawKey(DrawContext ctx,MinevoraConfig cfg,String value,int x,int y,boolean pressed){
-        HudScaleTransform.beginTile(ctx,cfg,x,y);
-        try{
-            GuiDraw.outlined(ctx,x,y,29,22,3,pressed?GuiDraw.ACCENT:GuiDraw.BUTTON,GuiDraw.STROKE);
-            GuiDraw.centerText(ctx,value,x,y+7,29,GuiDraw.WHITE);
         }finally{HudScaleTransform.end(ctx);}
     }
 }

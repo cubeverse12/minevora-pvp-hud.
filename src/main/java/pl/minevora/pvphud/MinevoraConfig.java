@@ -11,7 +11,7 @@ import java.util.*;
 public final class MinevoraConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String[] LEGACY = { "Armor HUD", "Keystrokes (WASD)", "CPS Counter", "FPS Counter", "Potion HUD", "Crosshair Editor", "Combo / Hit Color" };
-    public boolean[] enabled = {true, true, true, true, true, true, false};
+    public boolean[] enabled = {true, false, true, true, true, true, false};
     public String style = "Vertical";
     public String damageMode = "Value";
     public String toolLocation = "Right";
@@ -57,6 +57,7 @@ public final class MinevoraConfig {
                 if (!parsed.isJsonObject()) return;
                 existing = parsed.getAsJsonObject();
                 for (int i = 0; i < LEGACY.length; i++) {
+                    if (i == 1) continue; // Ignore saved legacy WASD enable state.
                     if (existing.has(LEGACY[i]) && existing.get(LEGACY[i]).isJsonObject()) {
                         enabled[i] = bool(existing.getAsJsonObject(LEGACY[i]),"enabled",enabled[i]);
                     }
@@ -79,6 +80,7 @@ public final class MinevoraConfig {
                     hudVisible=bool(o,"hudVisible",hudVisible);
                     hudScale=Math.max(.5f,Math.min(1f,decimal(o,"hudScale",hudScale)));
                 }
+                enabled[1] = false; // WASD can never be restored from saved settings.
                 stamp = modified;
             }
         } catch (Exception ignored) { /* Recover from unfinished edits by launcher. */ }
@@ -86,6 +88,7 @@ public final class MinevoraConfig {
     public synchronized void save() {
         try {
             Files.createDirectories(file.getParent());
+            enabled[1] = false;
             for (int i = 0; i < LEGACY.length; i++) {
                 JsonObject o = existing.has(LEGACY[i]) && existing.get(LEGACY[i]).isJsonObject()
                     ? existing.getAsJsonObject(LEGACY[i]) : new JsonObject();
@@ -115,7 +118,7 @@ public final class MinevoraConfig {
         } catch (Exception ignored) { /* Not fatal to gameplay. */ }
     }
     public void reset() {
-        enabled = new boolean[]{true,true,true,true,true,true,false};
+        enabled = new boolean[]{true,false,true,true,true,true,false};
         style="Vertical"; damageMode="Value"; toolLocation="Right"; alignment="Right";
         listMode="Normal"; spacing=2; borderThickness=1;
         dynamicColor=true; background=true; border=true;
