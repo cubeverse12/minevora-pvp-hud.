@@ -1,10 +1,13 @@
-name: Build MINEVORA PvP HUD
+name: Build and publish MINEVORA PvP HUD
 on:
   push:
     branches: [main, master]
   workflow_dispatch:
+
+# Publishing the installable JAR as a release requires this permission.
 permissions:
-  contents: read
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,20 +22,49 @@ jobs:
           gradle-version: '8.12'
       - name: Build Fabric mod
         run: gradle clean build --no-daemon --stacktrace
-      - name: Verify and collect JAR
+      - name: Verify and prepare release files
+        shell: bash
         run: |
           set -euo pipefail
+          version="$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')"
+          mc="$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          [[ "$mc" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]]
           mkdir -p release
+          found=0
           for file in build/libs/*.jar; do
             [[ -f "$file" ]] || continue
             [[ "$file" == *-sources.jar || "$file" == *-dev.jar ]] && continue
-            jar tf "$file" | grep -x 'fabric.mod.json'
-            jar tf "$file" | grep -x 'pl/minevora/pvphud/MinevoraPvpHud.class'
-            cp "$file" release/
+            jar tf "$file" | grep -x 'fabric.mod.json' >/dev/null
+            jar tf "$file" | grep -x 'pl/minevora/pvphud/MinevoraPvpHud.class' >/dev/null
+            name="MINEVORA-PVP-HUD-${version}-FABRIC-${mc}.jar"
+            cp "$file" "release/$name"
+            sha256sum "release/$name" | cut -d' ' -f1 > "release/$name.sha256"
+            found=$((found + 1))
           done
-          test -n "$(ls -A release)"
+          [[ "$found" -eq 1 ]] || { echo "Expected exactly one installable JAR, got $found"; exit 1; }
       - uses: actions/upload-artifact@v4
         with:
-          name: MINEVORA-PVP-HUD-2.0.8-FABRIC-1.21.1
-          path: release/*.jar
+          name: MINEVORA-PVP-HUD-BUILD
+          path: |
+            release/*.jar
+            release/*.sha256
           if-no-files-found: error
+      - name: Publish installable mod in GitHub Releases
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(sed -n 's/^mod_version=//p' gradle.properties | tr -d '\r')"
+          mc="$(sed -n 's/^minecraft_version=//p' gradle.properties | tr -d '\r')"
+          tag="v${version}-fabric-${mc}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag already exists; will not overwrite a published version."
+          else
+            gh release create "$tag" release/*.jar release/*.sha256 \
+              --title "MINEVORA PvP HUD ${version} - Fabric ${mc}" \
+              --notes "Minecraft Java ${mc}; Fabric Loader and Fabric API required. Download the JAR, or install it automatically using MINEVORA Launcher."
+          fi
