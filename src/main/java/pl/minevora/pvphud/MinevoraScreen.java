@@ -97,7 +97,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.11  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.12  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -229,7 +229,11 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Elementy wyposażenia",67,450,GuiDraw.WHITE);
         GuiDraw.chip(d,c.tool?"Miecz  ON":"Miecz OFF",248,439,122,c.tool);
         GuiDraw.chip(d,c.offhand?"Druga ręka  ON":"Druga ręka OFF",384,439,142,c.offhand);
-        GuiDraw.text(d,"Przytrzymaj Move w zakładce Armor i przeciągnij HUD w podglądzie.",67,553,GuiDraw.MUTED);
+        GuiDraw.text(d,"Wybierz gotowy profil HUD",67,506,GuiDraw.WHITE);
+        GuiDraw.chip(d,"PVP",248,516,120,false);
+        GuiDraw.chip(d,"MINIMAL",381,516,120,false);
+        GuiDraw.chip(d,"KLASYCZNY",514,516,147,false);
+        GuiDraw.text(d,"Armor -> USTAW HUD: przeciągnij panel w dowolne miejsce.",67,574,GuiDraw.MUTED);
         GuiDraw.text(d,"Caly PvP HUD podczas gry",67,610,GuiDraw.WHITE);
         GuiDraw.toggle(d,260,603,c.hudVisible);
         GuiDraw.text(d,"Wlaczenie i wylaczenie bez restartu. Skrot: H.",67,649,GuiDraw.MUTED);
@@ -338,6 +342,15 @@ public final class MinevoraScreen extends Screen {
                 if(toggleClick(x,y,260,603)){c.hudVisible=!c.hudVisible;changed=true;}
                 if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
                 if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
+                if(GuiDraw.inside(x,y,248,516,120,27)){
+                    c.style="Vertical";c.hudScale=.68f;c.background=true;c.border=true;c.spacing=2;c.showText=true;changed=true;
+                }
+                if(GuiDraw.inside(x,y,381,516,120,27)){
+                    c.style="Compact";c.hudScale=.55f;c.background=false;c.border=false;c.spacing=0;c.showText=false;changed=true;
+                }
+                if(GuiDraw.inside(x,y,514,516,147,27)){
+                    c.style="Vertical";c.hudScale=.74f;c.background=true;c.border=true;c.spacing=2;c.showText=true;changed=true;
+                }
             }
             case 3 -> {if(toggleClick(x,y,342,225)){c.enabled[2]=!c.enabled[2];changed=true;}}
             case 4 -> {if(toggleClick(x,y,260,233)){c.enabled[5]=!c.enabled[5];changed=true;}}
