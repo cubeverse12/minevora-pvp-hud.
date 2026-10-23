@@ -9,8 +9,17 @@ public final class GuiDraw {
     public static final int WHITE=0xFFF2F4FF, MUTED=0xFFA8B7D6, ACCENT=0xFF743BFA, CYAN=0xFF32E6EE;
     private GuiDraw() {}
 
+    // Applied only while rendering the PvP settings menu. In-game HUD stays unchanged.
+    private static float menuOpacity = 1.0f;
+    public static void setMenuOpacity(float opacity) {
+        menuOpacity = Math.max(0.0f, Math.min(1.0f, opacity));
+    }
     public static void rect(DrawContext c,int x,int y,int w,int h,int color){
-        if(w>0 && h>0)c.fill(x,y,x+w,y+h,color);
+        if(w<=0 || h<=0)return;
+        int originalAlpha=(color >>> 24) & 255;
+        int newAlpha=Math.round(originalAlpha * menuOpacity);
+        if(newAlpha<=0)return;
+        c.fill(x,y,x+w,y+h,(newAlpha<<24)|(color & 0x00FFFFFF));
     }
     public static void rounded(DrawContext c,int x,int y,int w,int h,int r,int color) {
         if (w<=0 || h<=0) return;

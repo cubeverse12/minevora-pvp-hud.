@@ -1,16 +1,14 @@
-# MINEVORA PvP HUD 2.0.10 — Fabric 1.21.1
+# MINEVORA PvP HUD 2.0.11 — przezroczyste menu (Fabric 1.21.1)
 
-## Zmiany
-
-- Dodano duży przełącznik całego PvP HUD w Mod Menu oraz drugi w zakładce HUD. Można wyłączyć i włączyć nakładkę bez restartu Minecrafta.
-- Zachowano skrót H i automatyczny zapis ustawienia widoczności.
-- Usunięto kafelki WASD wyświetlane podczas gry.
-- Usunięto włącznik WASD z menu modułów, a zakładka Keystrokes pokazuje teraz kliknięcia LPM/PPM (CPS).
-- Stara konfiguracja z włączonym WASD nie może już go przywrócić.
-- Zachowano Armor HUD, licznik FPS, CPS, Potion HUD, Crosshair, suwaki 50–100%, klawisz H i przesuwanie zbroi.
+## Nowości
+- Całe menu PvP Mod jest półprzezroczyste: świat Minecrafta jest widoczny za oknem.
+- W Settings dodano suwak „Przezroczystość menu” (25–85%). Domyślnie: 65%.
+- Teksty oraz prawdziwe ikony przedmiotów pozostają nieprzezroczyste i czytelne.
+- Podgląd Armor HUD zachowuje normalne kolory; nie jest przyciemniany suwakiem menu.
+- Wartość jest zapisywana w config/minevora_pvp.json jako _minevora_ui.menuTransparency.
+- Zachowano przełączanie całej nakładki klawiszem H, suwak rozmiaru HUD 50–100%, edycję położenia Armor HUD oraz brak kafelków WASD.
 
 ## Instalacja
-
-Przy aktywnym Fabric 1.21.1 w MINEVORA Launcher kliknij POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA.
-Mod wymaga Fabric API. Prawy Shift / P otwiera menu, H ukrywa lub pokazuje HUD. Zwykłe poruszanie WASD pozostaje bez zmian.
-To wydanie nie jest kompatybilne z Forge ani NeoForge.
+W launcherze MINEVORA wybierz **Fabric 1.21.1** i naciśnij **POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA**.
+Przed wymianą JAR zamknij Minecraft. Po ponownym uruchomieniu, w trakcie gry otwórz menu Prawym Shift lub P. Przejdź do Settings i zmień przezroczystość.
+To wydanie działa na Fabric 1.21.1 i wymaga Fabric API. Nie jest portem na Forge ani NeoForge.
