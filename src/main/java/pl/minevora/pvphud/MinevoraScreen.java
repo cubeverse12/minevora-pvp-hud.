@@ -5,6 +5,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ChatScreen;
 import net.minecraft.text.Text;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
@@ -35,13 +37,13 @@ public final class MinevoraScreen extends Screen {
     private double sy(double value){return (value-originY)/scale;}
     @Override public void render(DrawContext d,int mouseX,int mouseY,float delta) {
         computeBounds();
-        GuiDraw.rect(d,0,0,width,height,0xB6080D17);
+        GuiDraw.rect(d,0,0,width,height,0x40080D17);
         d.getMatrices().push();
         d.getMatrices().translate(originX,originY,0);
         d.getMatrices().scale((float)scale,(float)scale,1);
         drawWindow(d);
         d.getMatrices().pop();
-        super.render(d,mouseX,mouseY,delta);
+        // Avoid super.render() to prevent Minecraft background blur above the menu.
     }
     private void drawWindow(DrawContext d) {
         int panelH=minimized?85:718;
@@ -55,7 +57,7 @@ public final class MinevoraScreen extends Screen {
             int x=TAB_X[i],w=TAB_W[i];
             GuiDraw.outlined(d,x,15,w,55,8,tab==i?0xFF251543:0xFF0F1625,
                 tab==i?GuiDraw.ACCENT:0xFF273145);
-            GuiDraw.bigText(d,iconFor(i),x+w/2-5,23,1.3f,tab==i?0xFFA973FF:GuiDraw.MUTED);
+            d.drawItem(new ItemStack(switch(i){case 0->Items.NETHER_STAR;case 1->Items.CLOCK;case 2->Items.DIAMOND_CHESTPLATE;case 3->Items.REDSTONE;case 4->Items.TARGET;case 5->Items.WRITABLE_BOOK;default->Items.COMPARATOR;}),x+w/2-8,25);
             GuiDraw.centerText(d,TABS[i],x,52,w,tab==i?GuiDraw.WHITE:GuiDraw.MUTED);
         }
         GuiDraw.chip(d,minimized?"+":"-",1004,20,40,false);
@@ -71,7 +73,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.8  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -82,7 +84,7 @@ public final class MinevoraScreen extends Screen {
     }
     private void drawArmor(DrawContext d) {
         heading(d,"Armor HUD","Customize how your armor, items and durability are displayed in-game.");
-        GuiDraw.chip(d,moveMode?"Move  ON":"Move  +",745,107,93,moveMode);
+        GuiDraw.chip(d,"USTAW HUD",745,107,93,false);
         GuiDraw.chip(d,c.previewOn?"◉  Mod Preview":"⊘  Mod Preview",848,107,129,c.previewOn);
         GuiDraw.chip(d,"↻ Reset Settings",984,107,98,false);
         GuiDraw.text(d,"⌃   Style",36,160,GuiDraw.WHITE);
@@ -139,7 +141,7 @@ public final class MinevoraScreen extends Screen {
     }
     private void showItem(DrawContext d,String title,int x,int y,int tx,boolean on) {
         GuiDraw.rounded(d,x,y-7,30,28,4,0xFF16212B);
-        GuiDraw.centerText(d,title.equals("Helmet")?"H":title.equals("Chestplate")?"C":title.equals("Leggings")?"L":"B",x,y+2,30,GuiDraw.CYAN);
+        d.drawItem(new ItemStack(title.equals("Helmet")?Items.DIAMOND_HELMET:title.equals("Chestplate")?Items.DIAMOND_CHESTPLATE:title.equals("Leggings")?Items.DIAMOND_LEGGINGS:Items.DIAMOND_BOOTS),x+7,y-1);
         GuiDraw.text(d,"Show "+title,x+42,y+3,GuiDraw.MUTED);
         GuiDraw.toggle(d,tx,y-3,on);
     }
@@ -150,7 +152,10 @@ public final class MinevoraScreen extends Screen {
             GuiDraw.text(d,"Włącz przyciskiem Mod Preview.",702,430,GuiDraw.MUTED);
             return;
         }
-        d.drawTexture(PREVIEW,579,182,0,0,498,505,512,580);
+        GuiDraw.rounded(d,579,182,498,505,9,0xFF0C1524);
+        for(int xx=619;xx<1076;xx+=40)GuiDraw.rect(d,xx,184,1,501,0x303E4C72);
+        for(int yy=222;yy<685;yy+=40)GuiDraw.rect(d,580,yy,495,1,0x303E4C72);
+        GuiDraw.text(d,"PODGLAD HUD NA ZYWO",601,198,0xFFE8EEFF);
         GuiDraw.rect(d,579,183,498,505,0x18071327);
         int width=ArmorOverlay.panelWidth(c),height=ArmorOverlay.panelHeight(c,6);
         previewX=579+Math.round(c.hudX*Math.max(1,498-width));
@@ -219,16 +224,24 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Ta wersja nie modyfikuje ani nie odczytuje wiadomości serwera.",65,385,GuiDraw.MUTED);
     }
     private void drawSettingsTab(DrawContext d){
-        genericPanel(d,"Settings","Kolory, ustawienia globalne i przywracanie domyślnych wartości.");
+        genericPanel(d,"Settings","Ustawienia i skalowanie HUD podczas gry.");
         GuiDraw.text(d,"Kolor tekstu Armor HUD",65,230,GuiDraw.WHITE);
-        for(int i=0;i<COLORS.length;i++)swatch(d,272+i*49,223,COLORS[i]);
+        for(int i=0;i<6;i++)swatch(d,272+i*49,223,COLORS[i]);
         GuiDraw.text(d,"Kolor obramowania",65,287,GuiDraw.WHITE);
-        for(int i=0;i<COLORS.length;i++)swatch(d,272+i*49,280,COLORS[i]);
-        GuiDraw.text(d,"Widoczność liczb",65,354,GuiDraw.WHITE);
+        for(int i=0;i<6;i++)swatch(d,272+i*49,280,COLORS[i]);
+        GuiDraw.text(d,"Widocznosc liczb",65,354,GuiDraw.WHITE);
         GuiDraw.toggle(d,280,346,c.showText);
-        GuiDraw.text(d,"Przycisk otwierania menu: Prawy Shift (możesz zmienić w Sterowaniu Minecraft).",65,419,GuiDraw.MUTED);
-        GuiDraw.chip(d,"RESET ALL SETTINGS",65,520,230,false);
-        GuiDraw.text(d,"Zapis: .minecraft/config/minevora_pvp.json",65,573,GuiDraw.MUTED);
+        GuiDraw.text(d,"Pokaz caly PvP HUD",65,404,GuiDraw.WHITE);
+        GuiDraw.toggle(d,280,397,c.hudVisible);
+        GuiDraw.text(d,"Rozmiar kafelkow i Armor HUD: "+Math.round(c.hudScale*100)+"%",65,457,GuiDraw.WHITE);
+        GuiDraw.rect(d,300,488,304,5,GuiDraw.STROKE);
+        GuiDraw.rect(d,300,488,(int)((c.hudScale-.5f)*608),5,GuiDraw.ACCENT);
+        GuiDraw.rounded(d,300+(int)((c.hudScale-.5f)*608)-6,482,12,17,5,GuiDraw.ACCENT);
+        GuiDraw.text(d,"50%",260,485,GuiDraw.MUTED);
+        GuiDraw.text(d,"100%",618,485,GuiDraw.MUTED);
+        GuiDraw.text(d,"H: pokaz / ukryj HUD bez restartu Minecrafta",65,541,GuiDraw.MUTED);
+        GuiDraw.chip(d,"RESET ALL SETTINGS",65,582,230,false);
+        GuiDraw.text(d,"Zapis: config/minevora_pvp.json",65,633,GuiDraw.MUTED);
     }
     private int findChip(double mx,double my,String[] names,int[] xs,int[] ws,int y){
         for(int i=0;i<names.length;i++)if(GuiDraw.inside(mx,my,xs[i],y-6,ws[i],27))return i;
@@ -281,7 +294,7 @@ public final class MinevoraScreen extends Screen {
     private boolean clickArmor(double x,double y){
         if(GuiDraw.inside(x,y,848,107,129,27)){c.previewOn=!c.previewOn;return true;}
         if(GuiDraw.inside(x,y,984,107,98,27)){c.reset();return true;}
-        if(GuiDraw.inside(x,y,745,107,93,27)){moveMode=!moveMode;return true;}
+        if(GuiDraw.inside(x,y,745,107,93,27)){client.setScreen(new HudPositionScreen());return true;}
         if(c.previewOn && ((moveMode && GuiDraw.inside(x,y,579,182,498,505)) ||
                 GuiDraw.inside(x,y,previewX-5,previewY-5,ArmorOverlay.panelWidth(c)+10,ArmorOverlay.panelHeight(c,6)+10))){
             draggingHud=true;updateHudDrag(x,y);return true;
@@ -318,13 +331,15 @@ public final class MinevoraScreen extends Screen {
         if(toggleClick(x,y,504,663)){c.boots=!c.boots;return true;}
         return false;
     }
-    private boolean clickSettings(double x,double y) {
-        for(int i=0;i<COLORS.length;i++) {
+    private boolean clickSettings(double x,double y){
+        for(int i=0;i<6;i++){
             if(GuiDraw.inside(x,y,272+i*49,223,40,22)){c.textColor=COLORS[i];return true;}
             if(GuiDraw.inside(x,y,272+i*49,280,40,22)){c.borderColor=COLORS[i];return true;}
         }
         if(toggleClick(x,y,280,346)){c.showText=!c.showText;return true;}
-        if(GuiDraw.inside(x,y,65,520,230,27)){c.reset();return true;}
+        if(toggleClick(x,y,280,397)){c.hudVisible=!c.hudVisible;return true;}
+        if(GuiDraw.inside(x,y,285,477,345,30)){c.hudScale=Math.max(.5f,Math.min(1f,.5f+(float)((x-300)/304)*.5f));return true;}
+        if(GuiDraw.inside(x,y,65,582,230,27)){c.reset();return true;}
         return false;
     }
     private void slide(double x) {
@@ -336,6 +351,9 @@ public final class MinevoraScreen extends Screen {
     @Override public boolean mouseDragged(double mouseX,double mouseY,int button,double deltaX,double deltaY) {
         double x=sx(mouseX),y=sy(mouseY);
         if(draggingHud){updateHudDrag(x,y);return true;}
+        if(tab==6&&button==GLFW.GLFW_MOUSE_BUTTON_LEFT&&GuiDraw.inside(x,y,285,475,345,32)){
+            c.hudScale=Math.max(.5f,Math.min(1f,.5f+(float)((x-300)/304)*.5f));c.save();return true;
+        }
         if(!slider.isEmpty()){slide(x);return true;}
         return super.mouseDragged(mouseX,mouseY,button,deltaX,deltaY);
     }

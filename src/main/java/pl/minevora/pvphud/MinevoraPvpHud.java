@@ -17,7 +17,7 @@ public final class MinevoraPvpHud implements ClientModInitializer {
     public static MinevoraConfig CONFIG;
     public static int combo = 0, ticks = 0;
     private static long lastHit = 0;
-    private static KeyBinding openMenu;
+    private static KeyBinding openMenu, alternateMenu, toggleHud;
     private static boolean leftDown, rightDown;
     public static final ArrayDeque<Long> lClicks = new ArrayDeque<>(), rClicks = new ArrayDeque<>();
 
@@ -25,8 +25,14 @@ public final class MinevoraPvpHud implements ClientModInitializer {
         CONFIG = new MinevoraConfig();
         openMenu = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.minevorapvphud.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, "category.minevorapvphud"));
+        alternateMenu=KeyBindingHelper.registerKeyBinding(new KeyBinding("key.minevorapvphud.menu_alternate",InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_P,"category.minevorapvphud"));
+        toggleHud=KeyBindingHelper.registerKeyBinding(new KeyBinding("key.minevorapvphud.toggle_hud",InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_H,"category.minevorapvphud"));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            while (openMenu.wasPressed()) client.setScreen(new MinevoraScreen());
+            while(toggleHud.wasPressed()){CONFIG.hudVisible=!CONFIG.hudVisible;CONFIG.save();}
+            boolean wantsMenu=false;
+            while(openMenu.wasPressed())wantsMenu=true;
+            while(alternateMenu.wasPressed())wantsMenu=true;
+            if(wantsMenu&&client.currentScreen==null)client.setScreen(new MinevoraScreen());
             if (++ticks % 20 == 0 && !(client.currentScreen instanceof MinevoraScreen)) CONFIG.reloadIfUpdated();
             if (System.nanoTime()-lastHit > 2_500_000_000L) combo=0;
         });
@@ -39,7 +45,7 @@ public final class MinevoraPvpHud implements ClientModInitializer {
         HudRenderCallback.EVENT.register((ctx, counter) -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.player == null || c.world == null || c.currentScreen instanceof MinevoraScreen) return;
-            if (c.currentScreen == null) {
+            if (c.currentScreen == null && CONFIG.hudVisible) {
                 recordClicks(c);
                 ArmorOverlay.renderGame(ctx,c,CONFIG);
                 OtherHud.render(ctx,c,CONFIG);

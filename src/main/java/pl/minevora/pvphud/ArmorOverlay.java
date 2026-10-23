@@ -59,7 +59,9 @@ public final class ArmorOverlay {
         int sw=client.getWindow().getScaledWidth(),sh=client.getWindow().getScaledHeight();
         int x=Math.round(cfg.hudX*Math.max(0,sw-width));
         int y=Math.round(cfg.hudY*Math.max(0,sh-height));
-        render(ctx,client,cfg,items,x,y);
+        HudScaleTransform.beginArmor(ctx,cfg,sw,sh,x,y,width,height);
+        try{render(ctx,client,cfg,items,x,y);}
+        finally{HudScaleTransform.end(ctx);}
     }
     public static void renderPreview(DrawContext ctx,MinecraftClient client,MinevoraConfig cfg,int x,int y) {
         if(!cfg.enabled[0])return;

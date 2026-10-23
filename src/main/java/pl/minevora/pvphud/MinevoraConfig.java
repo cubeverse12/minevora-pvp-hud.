@@ -24,6 +24,8 @@ public final class MinevoraConfig {
     public int textColor = 0xFFFFFFFF, bgColor = 0xDB0A1020, borderColor = 0xFF793CFF;
     public float hudX = .82f, hudY = .31f;
     public boolean previewOn = true;
+    public boolean hudVisible = true;
+    public float hudScale = .74f;
     private JsonObject existing = new JsonObject();
     private Path file;
     private long stamp = -1L;
@@ -74,6 +76,8 @@ public final class MinevoraConfig {
                     textColor = integer(o,"textColor",textColor); bgColor = integer(o,"bgColor",bgColor);
                     borderColor = integer(o,"borderColor",borderColor);
                     hudX = decimal(o,"hudX",hudX); hudY = decimal(o,"hudY",hudY);
+                    hudVisible=bool(o,"hudVisible",hudVisible);
+                    hudScale=Math.max(.5f,Math.min(1f,decimal(o,"hudScale",hudScale)));
                 }
                 stamp = modified;
             }
@@ -101,6 +105,7 @@ public final class MinevoraConfig {
             o.addProperty("tool",tool); o.addProperty("offhand",offhand); o.addProperty("showText",showText);
             o.addProperty("textColor",textColor); o.addProperty("bgColor",bgColor);
             o.addProperty("borderColor",borderColor); o.addProperty("hudX",hudX); o.addProperty("hudY",hudY);
+            o.addProperty("hudVisible",hudVisible);o.addProperty("hudScale",hudScale);
             existing.add("_minevora_ui",o);
             Path temp = file.resolveSibling("minevora_pvp.json.tmp");
             Files.writeString(temp,GSON.toJson(existing), StandardCharsets.UTF_8);
@@ -116,7 +121,7 @@ public final class MinevoraConfig {
         dynamicColor=true; background=true; border=true;
         helmet=true; chestplate=true; leggings=true; boots=true; tool=true; offhand=true; showText=true;
         textColor=0xFFFFFFFF; bgColor=0xDB0A1020; borderColor=0xFF793CFF;
-        hudX=.82f; hudY=.31f;
+        hudX=.82f;hudY=.31f;hudVisible=true;hudScale=.74f;
         save();
     }
 }

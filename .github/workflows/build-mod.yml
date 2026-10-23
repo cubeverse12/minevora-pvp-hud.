@@ -1,31 +1,38 @@
-
 name: Build MINEVORA PvP HUD
-
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   workflow_dispatch:
-
+permissions:
+  contents: read
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
-
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.12'
-
-      - name: Build mod
-        run: gradle --no-daemon build
-
+      - name: Build Fabric mod
+        run: gradle clean build --no-daemon --stacktrace
+      - name: Verify and collect JAR
+        run: |
+          set -euo pipefail
+          mkdir -p release
+          for file in build/libs/*.jar; do
+            [[ -f "$file" ]] || continue
+            [[ "$file" == *-sources.jar || "$file" == *-dev.jar ]] && continue
+            jar tf "$file" | grep -x 'fabric.mod.json'
+            jar tf "$file" | grep -x 'pl/minevora/pvphud/MinevoraPvpHud.class'
+            cp "$file" release/
+          done
+          test -n "$(ls -A release)"
       - uses: actions/upload-artifact@v4
         with:
-          name: MINEVORA-PVP-HUD
-          path: build/libs/*.jar
+          name: MINEVORA-PVP-HUD-2.0.8-FABRIC-1.21.1
+          path: release/*.jar
           if-no-files-found: error

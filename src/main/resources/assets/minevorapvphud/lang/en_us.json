@@ -1,4 +1,6 @@
 {
-  "key.minevorapvphud.menu": "Open MINEVORA PvP HUD",
-  "category.minevorapvphud": "MINEVORA PvP HUD"
+  "category.minevorapvphud": "MINEVORA PvP HUD",
+  "key.minevorapvphud.menu": "Open menu",
+  "key.minevorapvphud.menu_alternate": "Open menu (P)",
+  "key.minevorapvphud.toggle_hud": "Show / hide HUD"
 }
