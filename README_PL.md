@@ -1,15 +1,13 @@
-# MINEVORA PvP HUD 2.0.13 — Neon Blue, Fabric 1.21.1
+# MINEVORA PvP HUD 2.0.14 — Neon Blue Lite
 
-## Wygląd jak MINEVORA Launcher 18.7
-- Granatowe, półprzezroczyste panele w stylu MINEVORA Neon Edition.
-- Niebieskie przyciski, błękitne obramowania, fioletowe detale aktywnej zakładki, niebieskie suwaki.
-- Zakładki i kafelki modułów używają ikon przedmiotów rysowanych przez Minecraft — nie symboli Unicode wymagających określonej czcionki.
-- Zachowano rzeczywisty świat gry za podglądem Armor HUD i pełną przezroczystość całego menu.
-- Suwak **Settings → Przezroczystość menu: 25–85%**. Domyślnie 65%. Zapis w config/minevora_pvp.json.
-- Domyślny kolor obramowania Armor HUD dopasowano do niebieskiego motywu; istniejących niestandardowych ustawień gracza nie nadpisujemy.
-- Zachowano presety PVP / MINIMAL / KLASYCZNY, skrót H do ukrywania nakładki, edycję położenia Armor HUD, FPS/CPS, crosshair i ustawienia.
+## Zmiany (24.10.2026)
+- Usunięto generator / szybkie presety układu HUD: PVP, MINIMAL, KLASYCZNY.
+- Uproszczono główne menu moda do pięciu kart: **Mod Menu, HUD, Armor, Crosshair, Settings**.
+- CPS i FPS pozostają dostępne w Mod Menu bez osobnych niepotrzebnych zakładek. Usunięto osobne zakładki Chat i Keystrokes, bez zmian sterowania w grze.
+- Zachowano niebiesko-fioletowy styl kompatybilny z MINEVORA Launcher 19.
+- Zachowano **półprzezroczyste panele i regulację 25–85%**, realne ikony Minecraft, podgląd zbroi, możliwość przesuwania elementów oraz skrót H do ukrywania HUD-u.
+- Zachowano istniejące ustawienia; nie przenosimy starej konfiguracji bez pytania.
 
 ## Instalacja
-Zamknij Minecraft, wybierz **Fabric 1.21.1** w MINEVORA Launcher i kliknij **POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA**.
-Otwórz Minecraft i naciśnij **Prawy Shift / P**. Podczas gry klawisz H przełącza widoczność HUD-u bez wyłączania Minecrafta.
-Ta kompilacja jest na Fabric 1.21.1. Inne loadery wymagają osobnych wersji.
+Zamknij Minecraft, uruchom Fabric 1.21.1 w MINEVORA Launcher, kliknij pobieranie PvP HUD z GitHuba. Mod Fabric wymaga Fabric API.
+Prawy Shift / P otwiera menu; H włącza i wyłącza HUD w trakcie gry. Mod nie jest portem Forge/NeoForge.

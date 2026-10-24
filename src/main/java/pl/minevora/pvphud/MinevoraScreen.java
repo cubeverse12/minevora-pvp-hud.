@@ -13,9 +13,10 @@ import org.lwjgl.glfw.GLFW;
 /** Visual configuration UI inspired by the supplied MINEVORA reference. */
 public final class MinevoraScreen extends Screen {
     private static final int W=1100,H=750;
-    private static final String[] TABS={"Mod Menu","HUD","Armor","Keystrokes","Crosshair","Chat","Settings"};
-    private static final int[] TAB_X={290,394,474,566,681,791,870};
-    private static final int[] TAB_W={96,72,84,107,100,71,99};
+    private static final String[] TABS={"Mod Menu","HUD","Armor","Crosshair","Settings"};
+    private static final int[] TAB_MAP={0,1,2,4,6};
+    private static final int[] TAB_X={338,462,586,710,834};
+    private static final int[] TAB_W={116,116,116,116,116};
     private static final Identifier PREVIEW=Identifier.of("minevorapvphud","textures/gui/preview.png");
     private static final int[] COLORS={0xFFFFFFFF,0xFF41CDFF,0xFF386CFF,0xFF7951FA,0xFF55DD79,0xFFFF647B};
     private final MinevoraConfig c = MinevoraPvpHud.CONFIG;
@@ -74,13 +75,14 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.bigText(d,"PvP Mod",208,39,1.15f,GuiDraw.SOFT_BLUE);
         for(int i=0;i<TABS.length;i++) {
             int x=TAB_X[i],w=TAB_W[i];
-            boolean active=tab==i;
+            int section=TAB_MAP[i];
+            boolean active=tab==section;
             if(active)GuiDraw.rounded(d,x-2,13,w+4,59,9,0x513986FF);
             GuiDraw.outlined(d,x,15,w,55,8,active?0xFF164DB4:0xFF102039,
                 active?0xFF67B8FF:GuiDraw.STROKE);
             if(active)GuiDraw.rect(d,x+9,17,w-18,2,GuiDraw.PURPLE);
             // Render actual Minecraft items so icons never depend on system fonts.
-            d.drawItem(new ItemStack(switch(i){case 0->Items.NETHER_STAR;case 1->Items.CLOCK;case 2->Items.DIAMOND_CHESTPLATE;case 3->Items.REDSTONE;case 4->Items.TARGET;case 5->Items.WRITABLE_BOOK;default->Items.COMPARATOR;}),x+w/2-8,25);
+            d.drawItem(new ItemStack(switch(section){case 0->Items.NETHER_STAR;case 1->Items.CLOCK;case 2->Items.DIAMOND_CHESTPLATE;case 4->Items.TARGET;default->Items.COMPARATOR;}),x+w/2-8,25);
             GuiDraw.centerText(d,TABS[i],x,52,w,active?GuiDraw.WHITE:GuiDraw.MUTED);
         }
         GuiDraw.chip(d,minimized?"+":"-",1004,20,40,false);
@@ -104,7 +106,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.13  •  Fabric 1.21.1  •  Neon Blue / zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.14  •  Fabric 1.21.1  •  Neon Blue / zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -246,11 +248,9 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Elementy wyposażenia",67,450,GuiDraw.WHITE);
         GuiDraw.chip(d,c.tool?"Miecz  ON":"Miecz OFF",248,439,122,c.tool);
         GuiDraw.chip(d,c.offhand?"Druga ręka  ON":"Druga ręka OFF",384,439,142,c.offhand);
-        GuiDraw.text(d,"Wybierz gotowy profil HUD",67,506,GuiDraw.WHITE);
-        GuiDraw.chip(d,"PVP",248,516,120,false);
-        GuiDraw.chip(d,"MINIMAL",381,516,120,false);
-        GuiDraw.chip(d,"KLASYCZNY",514,516,147,false);
-        GuiDraw.text(d,"Armor -> USTAW HUD: przeciągnij panel w dowolne miejsce.",67,574,GuiDraw.MUTED);
+        GuiDraw.text(d,"Wlasny uklad bez generatora presetow.",67,512,GuiDraw.WHITE);
+        GuiDraw.text(d,"Ustaw styl i skale recznie w zakladce Armor i Settings.",67,543,GuiDraw.MUTED);
+        GuiDraw.text(d,"Armor -> USTAW HUD: przeciagaj panel myszka.",67,574,GuiDraw.MUTED);
         GuiDraw.text(d,"Caly PvP HUD podczas gry",67,610,GuiDraw.WHITE);
         GuiDraw.toggle(d,260,603,c.hudVisible);
         GuiDraw.text(d,"Wlaczenie i wylaczenie bez restartu. Skrot: H.",67,649,GuiDraw.MUTED);
@@ -334,7 +334,7 @@ public final class MinevoraScreen extends Screen {
         if(GuiDraw.inside(x,y,1004,20,40,27)){minimized=!minimized;return true;}
         if(minimized)return true;
         for(int i=0;i<TABS.length;i++) {
-            if(GuiDraw.inside(x,y,TAB_X[i],15,TAB_W[i],55)){tab=i;return true;}
+            if(GuiDraw.inside(x,y,TAB_X[i],15,TAB_W[i],55)){tab=TAB_MAP[i];return true;}
         }
         boolean changed=false;
         switch(tab) {
@@ -359,15 +359,6 @@ public final class MinevoraScreen extends Screen {
                 if(toggleClick(x,y,260,603)){c.hudVisible=!c.hudVisible;changed=true;}
                 if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
                 if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
-                if(GuiDraw.inside(x,y,248,516,120,27)){
-                    c.style="Vertical";c.hudScale=.68f;c.background=true;c.border=true;c.spacing=2;c.showText=true;changed=true;
-                }
-                if(GuiDraw.inside(x,y,381,516,120,27)){
-                    c.style="Compact";c.hudScale=.55f;c.background=false;c.border=false;c.spacing=0;c.showText=false;changed=true;
-                }
-                if(GuiDraw.inside(x,y,514,516,147,27)){
-                    c.style="Vertical";c.hudScale=.74f;c.background=true;c.border=true;c.spacing=2;c.showText=true;changed=true;
-                }
             }
             case 3 -> {if(toggleClick(x,y,342,225)){c.enabled[2]=!c.enabled[2];changed=true;}}
             case 4 -> {if(toggleClick(x,y,260,233)){c.enabled[5]=!c.enabled[5];changed=true;}}
