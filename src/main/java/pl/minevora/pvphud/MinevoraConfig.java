@@ -21,7 +21,7 @@ public final class MinevoraConfig {
     public boolean dynamicColor = true, background = true, border = true;
     public boolean helmet = true, chestplate = true, leggings = true, boots = true, tool = true, offhand = true;
     public boolean showText = true;
-    public int textColor = 0xFFFFFFFF, bgColor = 0xDB0A1020, borderColor = 0xFF793CFF;
+    public int textColor = 0xFFFFFFFF, bgColor = 0xDB0A1730, borderColor = 0xFF386CFF;
     public float hudX = .82f, hudY = .31f;
     public boolean previewOn = true;
     public boolean hudVisible = true;
@@ -96,7 +96,7 @@ public final class MinevoraConfig {
                     ? existing.getAsJsonObject(LEGACY[i]) : new JsonObject();
                 o.addProperty("enabled",enabled[i]);
                 if (!o.has("position")) o.addProperty("position",i==0 ? "Prawy środek" : "Lewy górny");
-                if (!o.has("color")) o.addProperty("color","#913bff");
+                if (!o.has("color")) o.addProperty("color","#386cff");
                 existing.add(LEGACY[i],o);
             }
             JsonObject o = new JsonObject();
@@ -126,7 +126,7 @@ public final class MinevoraConfig {
         listMode="Normal"; spacing=2; borderThickness=1;
         dynamicColor=true; background=true; border=true;
         helmet=true; chestplate=true; leggings=true; boots=true; tool=true; offhand=true; showText=true;
-        textColor=0xFFFFFFFF; bgColor=0xDB0A1020; borderColor=0xFF793CFF;
+        textColor=0xFFFFFFFF; bgColor=0xDB0A1730; borderColor=0xFF386CFF;
         hudX=.82f;hudY=.31f;hudVisible=true;hudScale=.74f;menuTransparency=.65f;
         save();
     }

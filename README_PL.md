@@ -1,14 +1,15 @@
-# MINEVORA PvP HUD 2.0.12 — nowe profile wyglądu
+# MINEVORA PvP HUD 2.0.13 — Neon Blue, Fabric 1.21.1
 
-## Nowe w 2.0.12
-- Zakładka **HUD** ma trzy interaktywne presety: **PVP**, **MINIMAL**, **KLASYCZNY**.
-- Preset PVP: pionowe ikony zbroi, 68% skali, czytelna ramka i liczby.
-- Preset MINIMAL: skompaktowane ikony 55% skali, bez dodatkowego tła i ramki.
-- Preset KLASYCZNY: standardowy pionowy układ 74% skali.
-- Wybrany styl jest zapisywany w istniejącym configu, bez dodatkowych plików.
-- Zachowano przezroczystość menu (25–85%), przełącznik HUD klawiszem H, pozycjonowanie Armor HUD, prawdziwe ikony oraz usunięte WASD.
+## Wygląd jak MINEVORA Launcher 18.7
+- Granatowe, półprzezroczyste panele w stylu MINEVORA Neon Edition.
+- Niebieskie przyciski, błękitne obramowania, fioletowe detale aktywnej zakładki, niebieskie suwaki.
+- Zakładki i kafelki modułów używają ikon przedmiotów rysowanych przez Minecraft — nie symboli Unicode wymagających określonej czcionki.
+- Zachowano rzeczywisty świat gry za podglądem Armor HUD i pełną przezroczystość całego menu.
+- Suwak **Settings → Przezroczystość menu: 25–85%**. Domyślnie 65%. Zapis w config/minevora_pvp.json.
+- Domyślny kolor obramowania Armor HUD dopasowano do niebieskiego motywu; istniejących niestandardowych ustawień gracza nie nadpisujemy.
+- Zachowano presety PVP / MINIMAL / KLASYCZNY, skrót H do ukrywania nakładki, edycję położenia Armor HUD, FPS/CPS, crosshair i ustawienia.
 
 ## Instalacja
-Wybierz Fabric 1.21.1 z Fabric API w MINEVORA Launcher, kliknij **POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA**. Po uruchomieniu Minecrafta naciśnij **Prawy Shift / P**, wejdź w **HUD**, a następnie wybierz preset.
-
-Ta kompilacja działa na Minecraft Java 1.21.1 Fabric. Nie jest portem na Forge, NeoForge ani Quilt.
+Zamknij Minecraft, wybierz **Fabric 1.21.1** w MINEVORA Launcher i kliknij **POBIERZ I ZAINSTALUJ PVP HUD Z GITHUBA**.
+Otwórz Minecraft i naciśnij **Prawy Shift / P**. Podczas gry klawisz H przełącza widoczność HUD-u bez wyłączania Minecrafta.
+Ta kompilacja jest na Fabric 1.21.1. Inne loadery wymagają osobnych wersji.

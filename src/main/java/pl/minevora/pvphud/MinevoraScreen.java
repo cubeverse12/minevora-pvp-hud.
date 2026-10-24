@@ -17,7 +17,7 @@ public final class MinevoraScreen extends Screen {
     private static final int[] TAB_X={290,394,474,566,681,791,870};
     private static final int[] TAB_W={96,72,84,107,100,71,99};
     private static final Identifier PREVIEW=Identifier.of("minevorapvphud","textures/gui/preview.png");
-    private static final int[] COLORS={0xFFFFFFFF,0xFF63E5EF,0xFFAD78FF,0xFFF5CD5C,0xFF55DD79,0xFFFF647B};
+    private static final int[] COLORS={0xFFFFFFFF,0xFF41CDFF,0xFF386CFF,0xFF7951FA,0xFF55DD79,0xFFFF647B};
     private final MinevoraConfig c = MinevoraPvpHud.CONFIG;
     private int tab=2;
     private boolean minimized=false, draggingHud=false, moveMode=false;
@@ -38,7 +38,7 @@ public final class MinevoraScreen extends Screen {
     @Override public void render(DrawContext d,int mouseX,int mouseY,float delta) {
         computeBounds();
         // Keep the world visibly rendered while the menu is open.
-        GuiDraw.rect(d,0,0,width,height,0x08080D17);
+        GuiDraw.rect(d,0,0,width,height,0x0605142A);
         d.getMatrices().push();
         try {
             d.getMatrices().translate(originX,originY,0);
@@ -54,42 +54,49 @@ public final class MinevoraScreen extends Screen {
     private void drawWindow(DrawContext d) {
         int panelH=minimized?85:718;
         if(tab==2 && !minimized) {
-            // A true transparent viewport: the Minecraft world behind the UI remains visible.
-            GuiDraw.rounded(d,0,0,W,181,18,0xFF293249);
+            // Transparent Armor preview reveals the actual Minecraft scene.
+            GuiDraw.rounded(d,0,0,W,181,18,0xFF2D5B9B);
             GuiDraw.rounded(d,2,2,W-4,179,17,GuiDraw.PANEL);
             GuiDraw.rect(d,0,181,576,506,GuiDraw.PANEL);
             GuiDraw.rect(d,1078,181,22,506,GuiDraw.PANEL);
-            GuiDraw.rounded(d,0,687,W,31,18,0xFF293249);
+            GuiDraw.rounded(d,0,687,W,31,18,0xFF2D5B9B);
             GuiDraw.rounded(d,2,687,W-4,29,16,GuiDraw.PANEL);
         } else {
-            GuiDraw.rounded(d,0,0,W,panelH,18,0xFF293249);
+            GuiDraw.rounded(d,0,0,W,panelH,18,0xFF2D5B9B);
             GuiDraw.rounded(d,2,2,W-4,panelH-4,17,GuiDraw.PANEL);
         }
-        GuiDraw.rounded(d,17,14,40,50,9,0xFF15102A);
-        GuiDraw.bigText(d,"M",24,24,3.4f,GuiDraw.ACCENT);
+        // Subtle two-tone header, using Minecraft rectangles (no missing Unicode icons).
+        GuiDraw.rect(d,18,76,1064,2,GuiDraw.ACCENT);
+        GuiDraw.rect(d,18,79,1064,1,GuiDraw.PURPLE);
+        GuiDraw.outlined(d,17,14,40,50,9,0xFF09254B,0xFF337FFF);
+        GuiDraw.bigText(d,"M",24,24,3.4f,GuiDraw.CYAN);
         GuiDraw.bigText(d,"MINEVORA",66,28,2.6f,GuiDraw.WHITE);
-        GuiDraw.bigText(d,"PvP Mod",208,39,1.15f,0xFF97B9EF);
+        GuiDraw.bigText(d,"PvP Mod",208,39,1.15f,GuiDraw.SOFT_BLUE);
         for(int i=0;i<TABS.length;i++) {
             int x=TAB_X[i],w=TAB_W[i];
-            GuiDraw.outlined(d,x,15,w,55,8,tab==i?0xFF251543:0xFF0F1625,
-                tab==i?GuiDraw.ACCENT:0xFF273145);
+            boolean active=tab==i;
+            if(active)GuiDraw.rounded(d,x-2,13,w+4,59,9,0x513986FF);
+            GuiDraw.outlined(d,x,15,w,55,8,active?0xFF164DB4:0xFF102039,
+                active?0xFF67B8FF:GuiDraw.STROKE);
+            if(active)GuiDraw.rect(d,x+9,17,w-18,2,GuiDraw.PURPLE);
+            // Render actual Minecraft items so icons never depend on system fonts.
             d.drawItem(new ItemStack(switch(i){case 0->Items.NETHER_STAR;case 1->Items.CLOCK;case 2->Items.DIAMOND_CHESTPLATE;case 3->Items.REDSTONE;case 4->Items.TARGET;case 5->Items.WRITABLE_BOOK;default->Items.COMPARATOR;}),x+w/2-8,25);
-            GuiDraw.centerText(d,TABS[i],x,52,w,tab==i?GuiDraw.WHITE:GuiDraw.MUTED);
+            GuiDraw.centerText(d,TABS[i],x,52,w,active?GuiDraw.WHITE:GuiDraw.MUTED);
         }
         GuiDraw.chip(d,minimized?"+":"-",1004,20,40,false);
         GuiDraw.chip(d,"X",1050,20,35,false);
         if(minimized){GuiDraw.text(d,"Naciśnij +, aby rozwinąć panel.",30,65,GuiDraw.MUTED);return;}
-        GuiDraw.rect(d,18,83,W-36,1,0xFF2A334A);
+        GuiDraw.rect(d,18,83,W-36,1,0xFF2C518B);
         if(tab==2) {
             // Do not cover the world behind the right-hand live preview.
-            GuiDraw.rounded(d,18,86,1064,94,12,0xFF0A0F18);
-            GuiDraw.rect(d,18,180,558,510,0xFF0A0F18);
-            GuiDraw.rect(d,1078,180,4,510,0xFF0A0F18);
-            GuiDraw.rect(d,18,690,1064,7,0xFF0A0F18);
+            GuiDraw.rounded(d,18,86,1064,94,12,0xFF0C1B34);
+            GuiDraw.rect(d,18,180,558,510,0xFF0C1B34);
+            GuiDraw.rect(d,1078,180,4,510,0xFF0C1B34);
+            GuiDraw.rect(d,18,690,1064,7,0xFF0C1B34);
         } else {
-            GuiDraw.rounded(d,18,86,1064,611,12,0xFF0A0F18);
+            GuiDraw.rounded(d,18,86,1064,611,12,0xFF0C1B34);
         }
-        GuiDraw.rect(d,18,86,1064,1,0xFF29334B);
+        GuiDraw.rect(d,18,86,1064,1,0xFF294F88);
         if(tab==2)drawArmor(d);
         else if(tab==0)drawModules(d);
         else if(tab==1)drawHudTab(d);
@@ -97,14 +104,15 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.12  •  Fabric 1.21.1  •  Zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.13  •  Fabric 1.21.1  •  Neon Blue / zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
     private void heading(DrawContext d,String title,String subtitle) {
         GuiDraw.bigText(d,title,88,104,1.95f,GuiDraw.WHITE);
         GuiDraw.text(d,subtitle,88,134,GuiDraw.MUTED);
-        GuiDraw.bigText(d,"◆",37,104,2.5f,GuiDraw.ACCENT);
+        GuiDraw.outlined(d,36,105,36,36,8,0xFF102B56,0xFF2F83FF);
+        d.drawItem(new ItemStack(Items.DIAMOND_CHESTPLATE),46,114);
     }
     private void drawArmor(DrawContext d) {
         heading(d,"Armor HUD","Customize how your armor, items and durability are displayed in-game.");
@@ -112,7 +120,7 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.chip(d,c.previewOn?"◉  Mod Preview":"⊘  Mod Preview",848,107,129,c.previewOn);
         GuiDraw.chip(d,"↻ Reset Settings",984,107,98,false);
         GuiDraw.text(d,"⌃   Style",36,160,GuiDraw.WHITE);
-        GuiDraw.outlined(d,31,178,528,405,9,0xFF0D111A,0xFF242D40);
+        GuiDraw.neonFrame(d,31,178,528,405,9);
         rowLabel(d,"Display Style",198);
         chips(d,new String[]{"Vertical","Horizontal","Compact","Modern"},new int[]{241,316,409,490},new int[]{72,89,77,65},198,c.style);
         rowLabel(d,"Text Color",229);
@@ -140,7 +148,7 @@ public final class MinevoraScreen extends Screen {
         rowLabel(d,"Border Thickness",569);
         slider(d,295,566,251,Math.min(1,c.borderThickness/5f),String.valueOf(c.borderThickness));
         GuiDraw.text(d,"⌄   Show",36,600,GuiDraw.WHITE);
-        GuiDraw.outlined(d,31,617,528,76,9,0xFF0D111A,0xFF242D40);
+        GuiDraw.neonFrame(d,31,617,528,76,9);
         showItem(d,"Helmet",48,631,219,c.helmet);
         showItem(d,"Chestplate",48,666,219,c.chestplate);
         showItem(d,"Leggings",310,631,504,c.leggings);
@@ -152,36 +160,37 @@ public final class MinevoraScreen extends Screen {
         for(int i=0;i<names.length;i++) GuiDraw.chip(d,names[i],xs[i],y-6,ws[i],current.equals(names[i]));
     }
     private void swatch(DrawContext d,int x,int y,int color){
-        GuiDraw.outlined(d,x,y,40,22,4,color,0xFF4A526C);
+        GuiDraw.outlined(d,x,y,40,22,4,color,0xFF5B8BCC);
     }
     private void slider(DrawContext d,int x,int y,int w,float fraction,String value) {
         GuiDraw.rounded(d,x,y-3,42,24,4,GuiDraw.BUTTON);
         GuiDraw.centerText(d,value,x,y+4,42,GuiDraw.WHITE);
         int trackX=x+55;
-        GuiDraw.rounded(d,trackX,y+8,w-55,4,2,0xFF30384A);
+        GuiDraw.rounded(d,trackX,y+8,w-55,4,2,0xFF29436B);
         int to=trackX+Math.round(Math.max(0,Math.min(1,fraction))*(w-55));
         GuiDraw.rounded(d,trackX,y+8,to-trackX,4,2,GuiDraw.ACCENT);
-        GuiDraw.rounded(d,to-7,y+3,14,14,7,0xFF8B59FF);
+        GuiDraw.rounded(d,to-7,y+3,14,14,7,GuiDraw.CYAN);
     }
     private void showItem(DrawContext d,String title,int x,int y,int tx,boolean on) {
-        GuiDraw.rounded(d,x,y-7,30,28,4,0xFF16212B);
+        GuiDraw.outlined(d,x,y-7,30,28,5,0xFF102B4B,0xFF275589);
         d.drawItem(new ItemStack(title.equals("Helmet")?Items.DIAMOND_HELMET:title.equals("Chestplate")?Items.DIAMOND_CHESTPLATE:title.equals("Leggings")?Items.DIAMOND_LEGGINGS:Items.DIAMOND_BOOTS),x+7,y-1);
         GuiDraw.text(d,"Show "+title,x+42,y+3,GuiDraw.MUTED);
         GuiDraw.toggle(d,tx,y-3,on);
     }
     private void drawPreview(DrawContext d){
         // Transparent preview frame; Minecraft's real world is visible behind the live armor item preview.
-        GuiDraw.rect(d,576,179,504,2,0xFF334058);
-        GuiDraw.rect(d,576,179,2,512,0xFF334058);
-        GuiDraw.rect(d,1078,179,2,512,0xFF334058);
-        GuiDraw.rect(d,576,689,504,2,0xFF334058);
+        GuiDraw.rect(d,576,179,504,2,0xFF3A85E8);
+        GuiDraw.rect(d,576,179,2,512,0xFF3A85E8);
+        GuiDraw.rect(d,1078,179,2,512,0xFF3A85E8);
+        GuiDraw.rect(d,576,689,504,2,0xFF3A85E8);
         if(!c.previewOn) {
             GuiDraw.bigText(d,"Podgląd wyłączony",682,400,1.7f,GuiDraw.MUTED);
             GuiDraw.text(d,"Włącz przyciskiem Mod Preview.",702,430,GuiDraw.MUTED);
             return;
         }
-        GuiDraw.rect(d,579,182,498,505,0x12071327);
-        GuiDraw.rounded(d,592,193,215,24,6,0xD10C1528);
+        GuiDraw.rect(d,579,182,498,505,0x10081C3A);
+        GuiDraw.rounded(d,592,193,215,24,6,0xBC102B55);
+        GuiDraw.rect(d,592,219,215,2,GuiDraw.ACCENT);
         GuiDraw.text(d,"PODGLAD HUD NA ZYWO",601,201,0xFFE8EEFF);
         int width=ArmorOverlay.panelWidth(c),height=ArmorOverlay.panelHeight(c,6);
         previewX=579+Math.round(c.hudX*Math.max(1,498-width));
@@ -197,11 +206,19 @@ public final class MinevoraScreen extends Screen {
     }
     private void genericPanel(DrawContext d,String title,String desc){
         heading(d,title,desc);
-        GuiDraw.outlined(d,32,178,1038,510,12,0xFF101623,0xFF293247);
+        GuiDraw.neonFrame(d,32,178,1038,510,12);
     }
     private void moduleLine(DrawContext d,int n,String name,String sub,int x,int y) {
-        GuiDraw.outlined(d,x,y,470,76,8,0xFF111826,0xFF2B354B);
-        GuiDraw.bigText(d,"◆",x+16,y+21,1.8f,n==0?GuiDraw.CYAN:GuiDraw.ACCENT);
+        GuiDraw.outlined(d,x,y,470,76,8,0xFF10213C,0xFF294F86);
+        GuiDraw.rect(d,x+1,y+14,3,48,n==0?GuiDraw.CYAN:GuiDraw.ACCENT);
+        d.drawItem(new ItemStack(switch(n){
+            case 0->Items.DIAMOND_CHESTPLATE;
+            case 2->Items.REDSTONE;
+            case 3->Items.CLOCK;
+            case 4->Items.POTION;
+            case 5->Items.TARGET;
+            default->Items.IRON_SWORD;
+        }),x+18,y+26);
         GuiDraw.bigText(d,name,x+58,y+15,1.4f,GuiDraw.WHITE);
         GuiDraw.text(d,sub,x+58,y+43,GuiDraw.MUTED);
         GuiDraw.toggle(d,x+412,y+26,c.enabled[n]);
@@ -242,8 +259,8 @@ public final class MinevoraScreen extends Screen {
         genericPanel(d,"Keystrokes","Kliknięcia myszy i CPS — bez kafelków WASD.");
         GuiDraw.text(d,"Pokaż licznik CPS",65,230,GuiDraw.WHITE);
         GuiDraw.toggle(d,342,225,c.enabled[2]);
-        GuiDraw.outlined(d,102,297,390,120,9,0xFF0D1627,0xFF364162);
-        GuiDraw.outlined(d,518,297,390,120,9,0xFF0D1627,0xFF364162);
+        GuiDraw.neonFrame(d,102,297,390,120,9);
+        GuiDraw.neonFrame(d,518,297,390,120,9);
         GuiDraw.bigText(d,"LPM",232,311,1.8f,GuiDraw.CYAN);
         GuiDraw.bigText(d,"PPM",643,311,1.8f,GuiDraw.ACCENT);
         GuiDraw.bigText(d,String.valueOf(MinevoraPvpHud.lClicks.size()),281,351,2.8f,GuiDraw.WHITE);
@@ -252,11 +269,11 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"WASD usunięte z HUD-u; normalne poruszanie działa bez zmian.",102,474,GuiDraw.MUTED);
     }
     private void drawCrosshairTab(DrawContext d){
-        genericPanel(d,"Crosshair Editor","Włącz dodatkowy, fioletowy celownik PvP.");
+        genericPanel(d,"Crosshair Editor","Włącz dodatkowy, neonowo-niebieski celownik PvP.");
         GuiDraw.text(d,"Crosshair",65,241,GuiDraw.WHITE);
         GuiDraw.toggle(d,260,233,c.enabled[5]);
         int x=760,y=346;
-        GuiDraw.rect(d,x-1,y-1,3,3,0xFF9A65FF);
+        GuiDraw.rect(d,x-1,y-1,3,3,GuiDraw.PURPLE);
         GuiDraw.rect(d,x-22,y,15,2,GuiDraw.ACCENT);
         GuiDraw.rect(d,x+9,y,15,2,GuiDraw.ACCENT);
         GuiDraw.rect(d,x,y-22,2,15,GuiDraw.ACCENT);
@@ -282,13 +299,13 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Rozmiar kafelkow i Armor HUD: "+Math.round(c.hudScale*100)+"%",65,457,GuiDraw.WHITE);
         GuiDraw.rect(d,300,488,304,5,GuiDraw.STROKE);
         GuiDraw.rect(d,300,488,(int)((c.hudScale-.5f)*608),5,GuiDraw.ACCENT);
-        GuiDraw.rounded(d,300+(int)((c.hudScale-.5f)*608)-6,482,12,17,5,GuiDraw.ACCENT);
+        GuiDraw.rounded(d,300+(int)((c.hudScale-.5f)*608)-6,482,12,17,5,GuiDraw.CYAN);
         GuiDraw.text(d,"50%",260,485,GuiDraw.MUTED);
         GuiDraw.text(d,"100%",618,485,GuiDraw.MUTED);
         GuiDraw.text(d,"Przezroczystosc menu: "+Math.round(c.menuTransparency*100)+"%",65,532,GuiDraw.WHITE);
         GuiDraw.rect(d,300,568,304,5,GuiDraw.STROKE);
         GuiDraw.rect(d,300,568,Math.round((c.menuTransparency-.25f)/.60f*304),5,GuiDraw.ACCENT);
-        GuiDraw.rounded(d,300+Math.round((c.menuTransparency-.25f)/.60f*304)-6,562,12,17,5,GuiDraw.ACCENT);
+        GuiDraw.rounded(d,300+Math.round((c.menuTransparency-.25f)/.60f*304)-6,562,12,17,5,GuiDraw.CYAN);
         GuiDraw.text(d,"25%",260,565,GuiDraw.MUTED);
         GuiDraw.text(d,"85%",618,565,GuiDraw.MUTED);
         GuiDraw.chip(d,"RESET ALL SETTINGS",65,613,230,false);

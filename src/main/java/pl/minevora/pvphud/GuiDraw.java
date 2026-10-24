@@ -5,8 +5,10 @@ import net.minecraft.client.gui.DrawContext;
 
 /** Pixel-friendly dark UI primitives, no third-party UI library required. */
 public final class GuiDraw {
-    public static final int PANEL=0xF20C101A, BUTTON=0xFF171D2A, STROKE=0xFF283044;
-    public static final int WHITE=0xFFF2F4FF, MUTED=0xFFA8B7D6, ACCENT=0xFF743BFA, CYAN=0xFF32E6EE;
+    // The neon navy / electric-blue palette is shared with MINEVORA Launcher 18.7.
+    public static final int PANEL=0xF20A1730, BUTTON=0xFF11223D, STROKE=0xFF2B4C81;
+    public static final int WHITE=0xFFF3F7FF, MUTED=0xFFABBEE5, ACCENT=0xFF386CFF, CYAN=0xFF41CDFF;
+    public static final int PURPLE=0xFF7951FA, SOFT_BLUE=0xFF81AEFF;
     private GuiDraw() {}
 
     // Applied only while rendering the PvP settings menu. In-game HUD stays unchanged.
@@ -57,12 +59,24 @@ public final class GuiDraw {
     public static boolean inside(double mouseX,double mouseY,int x,int y,int w,int h) {
         return mouseX>=x && mouseX<x+w && mouseY>=y && mouseY<y+h;
     }
+    /** Blue-glow style controls. Their opacity still follows menuTransparency. */
     public static void chip(DrawContext c,String label,int x,int y,int w,boolean selected) {
-        outlined(c,x,y,w,27,5,selected?ACCENT:BUTTON,selected?0xFF9B6BFF:STROKE);
+        if(selected) {
+            rounded(c,x-2,y-2,w+4,31,7,0x523A85FF);
+            outlined(c,x,y,w,27,6,0xFF244BC6,0xFF65B6FF);
+            rect(c,x+6,y+2,w-12,2,PURPLE);
+        } else {
+            outlined(c,x,y,w,27,6,BUTTON,STROKE);
+        }
         centerText(c,label,x,y+9,w,selected?WHITE:MUTED);
     }
     public static void toggle(DrawContext c,int x,int y,boolean on) {
-        rounded(c,x,y,39,19,9,on?ACCENT:0xFF343A4B);
-        rounded(c,x+(on?23:3),y+3,13,13,6,0xFFF9F9FF);
+        rounded(c,x,y,39,19,9,on?ACCENT:0xFF34445F);
+        if(on) rect(c,x+6,y+2,26,2,0xFF75C9FF);
+        rounded(c,x+(on?23:3),y+3,13,13,6,0xFFF4F8FF);
+    }
+    public static void neonFrame(DrawContext c,int x,int y,int w,int h,int r) {
+        outlined(c,x,y,w,h,r,0xB3081731,0xFF2B4D88);
+        rect(c,x+14,y+1,Math.min(64,w-28),2,0xFF326AFF);
     }
 }
