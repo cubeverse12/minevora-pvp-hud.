@@ -21,6 +21,8 @@ public final class MinevoraConfig {
     public boolean dynamicColor = true, background = true, border = true;
     public boolean helmet = true, chestplate = true, leggings = true, boots = true, tool = true, offhand = true;
     public boolean showText = true;
+    // Read-only HUD values: never change the player health or hunger.
+    public boolean showHealth = true, showHunger = true, showFoodCount = true;
     public int textColor = 0xFFFFFFFF, bgColor = 0xDB0A1730, borderColor = 0xFF386CFF;
     public float hudX = .82f, hudY = .31f;
     public boolean previewOn = true;
@@ -75,6 +77,9 @@ public final class MinevoraConfig {
                     leggings = bool(o,"leggings",leggings); boots = bool(o,"boots",boots);
                     tool = bool(o,"tool",tool); offhand = bool(o,"offhand",offhand);
                     showText = bool(o,"showText",showText);
+                    showHealth = bool(o,"showHealth",showHealth);
+                    showHunger = bool(o,"showHunger",showHunger);
+                    showFoodCount = bool(o,"showFoodCount",showFoodCount);
                     textColor = integer(o,"textColor",textColor); bgColor = integer(o,"bgColor",bgColor);
                     borderColor = integer(o,"borderColor",borderColor);
                     hudX = decimal(o,"hudX",hudX); hudY = decimal(o,"hudY",hudY);
@@ -108,6 +113,8 @@ public final class MinevoraConfig {
             o.addProperty("border",border); o.addProperty("helmet",helmet); o.addProperty("chestplate",chestplate);
             o.addProperty("leggings",leggings); o.addProperty("boots",boots);
             o.addProperty("tool",tool); o.addProperty("offhand",offhand); o.addProperty("showText",showText);
+            o.addProperty("showHealth",showHealth); o.addProperty("showHunger",showHunger);
+            o.addProperty("showFoodCount",showFoodCount);
             o.addProperty("textColor",textColor); o.addProperty("bgColor",bgColor);
             o.addProperty("borderColor",borderColor); o.addProperty("hudX",hudX); o.addProperty("hudY",hudY);
             o.addProperty("hudVisible",hudVisible);o.addProperty("hudScale",hudScale);
@@ -126,6 +133,7 @@ public final class MinevoraConfig {
         listMode="Normal"; spacing=2; borderThickness=1;
         dynamicColor=true; background=true; border=true;
         helmet=true; chestplate=true; leggings=true; boots=true; tool=true; offhand=true; showText=true;
+        showHealth=true;showHunger=true;showFoodCount=true;
         textColor=0xFFFFFFFF; bgColor=0xDB0A1730; borderColor=0xFF386CFF;
         hudX=.82f;hudY=.31f;hudVisible=true;hudScale=.74f;menuTransparency=.65f;
         save();
