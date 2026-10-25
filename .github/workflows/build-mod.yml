@@ -1,7 +1,7 @@
 name: Build and publish MINEVORA PvP HUD
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, codex/pvp-vitals-hud-20261025]
   workflow_dispatch:
 
 # Publishing the installable JAR as a release requires this permission.
