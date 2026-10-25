@@ -3,6 +3,8 @@ package pl.minevora.pvphud;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,23 @@ public final class OtherHud {
         }
         if(c.enabled[3]) {
             leftY=panel(ctx,c,"FPS  "+client.getCurrentFps(),12,leftY)+5;
+        }
+        // Read-only values from the local player; never modify server game stats.
+        if(c.showHealth) {
+            float current=client.player.getHealth(), max=client.player.getMaxHealth();
+            leftY=panel(ctx,c,"HP  "+number(current)+" / "+number(max),12,leftY)+5;
+        }
+        if(c.showHunger) {
+            leftY=panel(ctx,c,"GLOD  "+client.player.getHungerManager().getFoodLevel()+" / 20",12,leftY)+5;
+        }
+        if(c.showFoodCount) {
+            int count=0;
+            for(ItemStack stack:client.player.getInventory().main) {
+                if(!stack.isEmpty() && stack.get(DataComponentTypes.FOOD)!=null)count+=stack.getCount();
+            }
+            ItemStack offhand=client.player.getOffHandStack();
+            if(!offhand.isEmpty() && offhand.get(DataComponentTypes.FOOD)!=null)count+=offhand.getCount();
+            leftY=panel(ctx,c,"JEDZENIE  "+count,12,leftY)+5;
         }
         if(c.enabled[4]) {
             List<String> effects=new ArrayList<>();
@@ -42,6 +61,11 @@ public final class OtherHud {
             GuiDraw.rect(ctx,x-9,y,6,1,a);GuiDraw.rect(ctx,x+4,y,6,1,a);
             GuiDraw.rect(ctx,x,y-9,1,6,a);GuiDraw.rect(ctx,x,y+4,1,6,a);
         }
+    }
+    private static String number(float value) {
+        return Math.round(value * 10f) % 10 == 0
+            ? String.valueOf(Math.round(value))
+            : String.valueOf(Math.round(value * 10f) / 10f);
     }
     private static int panel(DrawContext ctx,MinevoraConfig cfg,String text,int x,int y){
         HudScaleTransform.beginTile(ctx,cfg,x,y);
