@@ -3,7 +3,7 @@
   "id": "minevorapvphud",
   "version": "${version}",
   "name": "MINEVORA PvP HUD",
-  "description": "Ciemny, fioletowy interfejs PvP HUD: Armor HUD, FPS, CPS, Combo i Crosshair; bez kafelkow WASD.",
+  "description": "Interfejs PvP: przesuwane Armor, FPS, CPS, Combo i mikstury oraz serca nad graczami.",
   "authors": ["MINEVORA"],
   "environment": "client",
   "entrypoints": {"client": ["pl.minevora.pvphud.MinevoraPvpHud"]},
