@@ -23,10 +23,11 @@ public final class MinevoraPvpHud implements ClientModInitializer {
 
     @Override public void onInitializeClient() {
         CONFIG = new MinevoraConfig();
+        CONFIG.hudVisible = false; // Start hidden until Left Shift is pressed in game.
         openMenu = KeyBindingHelper.registerKeyBinding(new KeyBinding(
             "key.minevorapvphud.menu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT_SHIFT, "category.minevorapvphud"));
         alternateMenu=KeyBindingHelper.registerKeyBinding(new KeyBinding("key.minevorapvphud.menu_alternate",InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_P,"category.minevorapvphud"));
-        toggleHud=KeyBindingHelper.registerKeyBinding(new KeyBinding("key.minevorapvphud.toggle_hud",InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_H,"category.minevorapvphud"));
+        toggleHud=KeyBindingHelper.registerKeyBinding(new KeyBinding("key.minevorapvphud.toggle_hud",InputUtil.Type.KEYSYM,GLFW.GLFW_KEY_LEFT_SHIFT,"category.minevorapvphud"));
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while(toggleHud.wasPressed()){CONFIG.hudVisible=!CONFIG.hudVisible;CONFIG.save();}
             boolean wantsMenu=false;
