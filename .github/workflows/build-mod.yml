@@ -2,6 +2,7 @@ name: Build and publish MINEVORA PvP HUD
 on:
   push:
     branches: [main, master]
+  pull_request:
   workflow_dispatch:
 
 # Publishing the installable JAR as a release requires this permission.

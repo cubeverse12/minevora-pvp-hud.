@@ -25,6 +25,25 @@ public final class MinevoraConfig {
     public float hudX = .82f, hudY = .31f;
     public boolean previewOn = true;
     public boolean hudVisible = true;
+    public boolean showPlayerHearts = true;
+    private final Map<String, float[]> tilePositions = new HashMap<>();
+
+    private static float clamp01(float value) {
+        return Float.isFinite(value) ? Math.max(0f, Math.min(1f, value)) : 0f;
+    }
+    private static float defaultTileX(String id) {
+        return switch(id) { case "combo" -> .46f; default -> .03f; };
+    }
+    private static float defaultTileY(String id) {
+        return switch(id) { case "fps" -> .095f; case "potions" -> .75f; case "combo" -> .085f; default -> .035f; };
+    }
+    public float tileX(String id) { float[] p=tilePositions.get(id);return p==null?defaultTileX(id):p[0]; }
+    public float tileY(String id) { float[] p=tilePositions.get(id);return p==null?defaultTileY(id):p[1]; }
+    public void setTilePosition(String id,float x,float y) {
+        if(!List.of("cps","fps","potions","combo").contains(id))return;
+        tilePositions.put(id,new float[]{clamp01(x),clamp01(y)});
+    }
+    public void resetTilePositions() {tilePositions.clear();}
     public float hudScale = .74f;
     public float menuTransparency = .65f; // 65%: world visible behind menu by default
     private JsonObject existing = new JsonObject();
@@ -79,6 +98,19 @@ public final class MinevoraConfig {
                     borderColor = integer(o,"borderColor",borderColor);
                     hudX = decimal(o,"hudX",hudX); hudY = decimal(o,"hudY",hudY);
                     hudVisible=bool(o,"hudVisible",hudVisible);
+                    showPlayerHearts=bool(o,"showPlayerHearts",showPlayerHearts);
+                    if(o.has("tilePositions") && o.get("tilePositions").isJsonObject()) {
+                        tilePositions.clear();
+                        JsonObject tileJson=o.getAsJsonObject("tilePositions");
+                        for(String id:List.of("cps","fps","potions","combo")) {
+                            if(!tileJson.has(id) || !tileJson.get(id).isJsonArray())continue;
+                            JsonArray arr=tileJson.getAsJsonArray(id);
+                            if(arr.size()>=2) {
+                                try {setTilePosition(id,arr.get(0).getAsFloat(),arr.get(1).getAsFloat());}
+                                catch(Exception ignored) { /* retain defaults */ }
+                            }
+                        }
+                    }
                     hudScale=Math.max(.5f,Math.min(1f,decimal(o,"hudScale",hudScale)));
                     menuTransparency=Math.max(.25f,Math.min(.85f,decimal(o,"menuTransparency",menuTransparency)));
                 }
@@ -111,6 +143,13 @@ public final class MinevoraConfig {
             o.addProperty("textColor",textColor); o.addProperty("bgColor",bgColor);
             o.addProperty("borderColor",borderColor); o.addProperty("hudX",hudX); o.addProperty("hudY",hudY);
             o.addProperty("hudVisible",hudVisible);o.addProperty("hudScale",hudScale);
+            o.addProperty("showPlayerHearts",showPlayerHearts);
+            JsonObject positions=new JsonObject();
+            for(String id:List.of("cps","fps","potions","combo")) {
+                JsonArray pair=new JsonArray();pair.add(tileX(id));pair.add(tileY(id));
+                positions.add(id,pair);
+            }
+            o.add("tilePositions",positions);
             o.addProperty("menuTransparency",menuTransparency);
             existing.add("_minevora_ui",o);
             Path temp = file.resolveSibling("minevora_pvp.json.tmp");
@@ -128,6 +167,7 @@ public final class MinevoraConfig {
         helmet=true; chestplate=true; leggings=true; boots=true; tool=true; offhand=true; showText=true;
         textColor=0xFFFFFFFF; bgColor=0xDB0A1730; borderColor=0xFF386CFF;
         hudX=.82f;hudY=.31f;hudVisible=true;hudScale=.74f;menuTransparency=.65f;
+        showPlayerHearts=true;resetTilePositions();
         save();
     }
 }

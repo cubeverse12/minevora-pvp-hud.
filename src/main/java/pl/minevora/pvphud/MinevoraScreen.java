@@ -106,7 +106,7 @@ public final class MinevoraScreen extends Screen {
         else if(tab==4)drawCrosshairTab(d);
         else if(tab==5)drawChatTab(d);
         else drawSettingsTab(d);
-        GuiDraw.text(d,"MINEVORA 2.0.14  •  Fabric 1.21.1  •  Neon Blue / zapis automatyczny",28,705,0xFF7D8AAA);
+        GuiDraw.text(d,"MINEVORA 2.0.15  •  Fabric 1.21.1  •  Neon Blue / zapis automatyczny",28,705,0xFF7D8AAA);
         GuiDraw.text(d,"RIGHT SHIFT — Otwórz / Zamknij",854,705,0xFF7D8AAA);
     }
     private String iconFor(int i){return new String[]{"▦","▣","◆","⌨","⊕","☏","⚙"}[i];}
@@ -238,7 +238,7 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.text(d,"Kliknij panel, aby wlaczyc lub wylaczyc HUD w trakcie gry. Skrot: H.",55,654,GuiDraw.MUTED);
     }
     private void drawHudTab(DrawContext d) {
-        genericPanel(d,"HUD Editor","Przesuwaj panel zbroi i zmieniaj jego położenie na ekranie.");
+        genericPanel(d,"HUD Editor","Ustaw niezaleznie Armor, CPS, FPS, mikstury i Combo.");
         GuiDraw.text(d,"Położenie poziome",67,241,GuiDraw.WHITE);
         slider(d,248,235,680,c.hudX,Math.round(c.hudX*100)+"%");
         GuiDraw.text(d,"Położenie pionowe",67,312,GuiDraw.WHITE);
@@ -250,10 +250,13 @@ public final class MinevoraScreen extends Screen {
         GuiDraw.chip(d,c.offhand?"Druga ręka  ON":"Druga ręka OFF",384,439,142,c.offhand);
         GuiDraw.text(d,"Wlasny uklad bez generatora presetow.",67,512,GuiDraw.WHITE);
         GuiDraw.text(d,"Ustaw styl i skale recznie w zakladce Armor i Settings.",67,543,GuiDraw.MUTED);
-        GuiDraw.text(d,"Armor -> USTAW HUD: przeciagaj panel myszka.",67,574,GuiDraw.MUTED);
+        GuiDraw.chip(d,"PRZESUN KAFELKI",640,510,210,true);
+        GuiDraw.text(d,"Wszystkie kafelki mozna ustawic myszka.",67,574,GuiDraw.MUTED);
         GuiDraw.text(d,"Caly PvP HUD podczas gry",67,610,GuiDraw.WHITE);
         GuiDraw.toggle(d,260,603,c.hudVisible);
         GuiDraw.text(d,"Wlaczenie i wylaczenie bez restartu. Skrot: H.",67,649,GuiDraw.MUTED);
+        GuiDraw.text(d,"Serca nad graczami",586,607,GuiDraw.WHITE);
+        GuiDraw.toggle(d,850,603,c.showPlayerHearts);
     }
     private void drawKeystrokesTab(DrawContext d){
         genericPanel(d,"Keystrokes","Kliknięcia myszy i CPS — bez kafelków WASD.");
@@ -357,6 +360,8 @@ public final class MinevoraScreen extends Screen {
                 if(GuiDraw.inside(x,y,248,302,680,31)){c.hudY=clamp((float)((x-303)/625.0));changed=true;}
                 if(toggleClick(x,y,260,388)){c.enabled[0]=!c.enabled[0];changed=true;}
                 if(toggleClick(x,y,260,603)){c.hudVisible=!c.hudVisible;changed=true;}
+                if(toggleClick(x,y,850,603)){c.showPlayerHearts=!c.showPlayerHearts;changed=true;}
+                if(GuiDraw.inside(x,y,640,510,210,27)){client.setScreen(new HudPositionScreen());return true;}
                 if(GuiDraw.inside(x,y,248,439,122,27)){c.tool=!c.tool;changed=true;}
                 if(GuiDraw.inside(x,y,384,439,142,27)){c.offhand=!c.offhand;changed=true;}
             }

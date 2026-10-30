@@ -3,6 +3,7 @@ package pl.minevora.pvphud;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.event.player.AttackEntityCallback;
 import net.minecraft.client.MinecraftClient;
@@ -42,6 +43,7 @@ public final class MinevoraPvpHud implements ClientModInitializer {
             }
             return ActionResult.PASS;
         });
+        WorldRenderEvents.AFTER_ENTITIES.register(PlayerHearts::render);
         HudRenderCallback.EVENT.register((ctx, counter) -> {
             MinecraftClient c = MinecraftClient.getInstance();
             if (c.player == null || c.world == null || c.currentScreen instanceof MinevoraScreen) return;
